@@ -16,7 +16,7 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(tsh SHARED
-    ${SRC_DIR}/tsh.cpp ${INCLUDE_DIR}/tsh.h
+    ${SRC_DIR}/tsh.cpp ${INCLUDE_DIR}/tsh.hpp
 )
 
 # 添加可执行文件，并指定源文件
