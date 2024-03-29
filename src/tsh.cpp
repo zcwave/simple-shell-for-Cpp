@@ -13,61 +13,70 @@ using std::string;
  * background children don't receive SIGINT (SIGTSTP) from the kernel
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
-void eval(char *cmdline) 
- {
-   char *argv[MAXARGS]; // argument list exec()
-   char buf[MAXLINE]; // Holds modified commmand line.
-   int bg; // should the job run in bg or fg?
-   pid_t pid;
+void eval(const std::string_view command_line) { 
+    std::vector<std::string> argv{"ls", "-l"}; // argument list exec()
+
+  //  char buf[MAXLINE]; // Holds modified commmand line.
+  //  int bg; // should the job run in bg or fg?
+  //  pid_t pid;
  
-   strcpy(buf, cmdline);
-   bg = parseline(buf, argv); 
-   // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
+  //  strcpy(buf, cmdline);
+  //  bg = parseline(buf, argv); 
+  //  // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
  
-   if (argv[0] == NULL)
-     return; // Ignore empty lines.
+  //  if (argv[0] == NULL)
+  //    return; // Ignore empty lines.
  
  
-   if (!builtin_cmd(argv)){
+  //  if (!isbuiltinCommand(argv)){
  
-     sigset_t mask_all;
-     sigset_t mask_one, prev_one;
+    //  sigset_t mask_all;
+    //  sigset_t mask_one, prev_one;
  
-     Sigfillset(&mask_all);
-     Sigemptyset(&mask_one);
-     Sigaddset(&mask_one, SIGCHLD);
+    //  Sigfillset(&mask_all);
+    //  Sigemptyset(&mask_one);
+    //  Sigaddset(&mask_one, SIGCHLD);
      
-     BLOCK(mask_one, prev_one); // Block SIGCHLD.
+    //  BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
-     pid = Fork();
+    if (auto pid = fork()){
+
+    }
+    else {
+        setpgid(0, 0);
+        if (execve(argv[0].c_str(), argv.data().c_str(), environ) < 0) {
+          std::cout << argv[0] << ": Command not found. " << std::endl;
+        }
+    }
+    
  
-     if (pid == 0){
-       // child runs user job.
-       UNBLOCK(prev_one); //Unblock SIGCHLD.
-       setpgid(0, 0);
-       if (execve(argv[0], argv, environ) < 0){
-         printf("%s: Command not found. \n", argv[0]);
-         exit(0);
-       }
-     }
-     else {
-       int state = bg ? BG : FG;
-       BLOCK_NOT_SAVE_OLD_SET(mask_all);
-       addjob(jobs, pid, state, cmdline);
-       UNBLOCK(prev_one); // Unblock SIGCHLD.
+  //    if (pid == 0){
+  //      // child runs user job.
+  //      UNBLOCK(prev_one); //Unblock SIGCHLD.
+  //      setpgid(0, 0);
+  //      if (execve(argv[0], argv, environ) < 0){
+  //        printf("%s: Command not found. \n", argv[0]);
+  //        exit(0);
+  //      }
+  //    }
+  //    else {
+  //      int state = bg ? BG : FG;
+  //      BLOCK_NOT_SAVE_OLD_SET(mask_all);
+  //      addjob(jobs, pid, state, cmdline);
+  //      UNBLOCK(prev_one); // Unblock SIGCHLD.
  
-       /* Parent waits for fg job to terminate.*/
-       if (!bg){
-         waitfg(pid);
-       }
-       else {
-         // the job is bg.
-         BLOCK_NOT_SAVE_OLD_SET(mask_all);
-         printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
-       }  
-       UNBLOCK(prev_one);//Unblock all signal
-     } 
-   }
+  //      /* Parent waits for fg job to terminate.*/
+  //      if (!bg){
+  //        waitfg(pid);
+  //      }
+  //      else {
+  //        // the job is bg.
+  //        BLOCK_NOT_SAVE_OLD_SET(mask_all);
+  //        printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+  //      }  
+  //      UNBLOCK(prev_one);//Unblock all signal
+  //    } 
+  //  }
  }
 
 // /* 
@@ -131,7 +140,7 @@ void eval(char *cmdline)
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-bool isbuiltinCommand(const string &cmd_name) {
+bool isbuiltinCommand(const std::string_view cmd_name) {
 
     if (cmd_name == "quit")
         exit(0);
