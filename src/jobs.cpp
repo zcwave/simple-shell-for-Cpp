@@ -1,43 +1,40 @@
+#include "tsh.h"
 #include "jobs.h"
-
+#include <algorithm>
 /***********************************************
  * Helper routines that manipulate the job list
  **********************************************/
 
-/* clearjob - Clear the entries in a job struct */
-void clearjob(struct job_t *job) {
-    job->pid = 0;
-    job->jid = 0;
-    job->state = UNDEF;
-    job->cmdline[0] = '\0';
-}
+// /* clearjob - Clear the entries in a job struct */
+// void clearjob(job_t *job) {
+//     job->pid = 0;
+//     job->jid = 0;
+//     job->state = UNDEF;
+//     job->cmdline[0] = '\0';
+// }
 
-/* initjobs - Initialize the job list */
-void initjobs(struct job_t *jobs) {
-    int i;
+// /* initjobs - Initialize the job list */
+// void initjobs(struct job_t *jobs) {
+//     int i;
 
-    for (i = 0; i < MAXJOBS; i++)
-	clearjob(&jobs[i]);
-}
+//     for (i = 0; i < MAXJOBS; i++)
+// 		clearjob(&jobs[i]);
+// }
 
 /* maxjid - Returns largest allocated job ID */
-int maxjid(struct job_t *jobs) 
-{
-    int i, max=0;
-
-    for (i = 0; i < MAXJOBS; i++)
-	if (jobs[i].jid > max)
-	    max = jobs[i].jid;
-    return max;
+int maxjid(const std::vector<job_t> &jobs) {
+	auto comp = [](job_t j1, job_t j2) { return j1.jid < j2.jid;};
+	auto max = std::max_element(jobs.begin(), jobs.end(), comp);
+    return max->jid;
 }
 
 /* addjob - Add a job to the job list */
-int addjob(struct job_t *jobs, pid_t pid, int state, char *cmdline) 
+bool addjob(std::vector<job_t> &jobs, pid_t pid, JobState state, char *cmdline) 
 {
     int i;
     
     if (pid < 1)
-	return 0;
+		return false;
 
     for (i = 0; i < MAXJOBS; i++) {
 	if (jobs[i].pid == 0) {

@@ -1,4 +1,4 @@
-
+#include <print>
 /***********************
  * Other helper routines
  ***********************/
@@ -8,10 +8,10 @@
  */
 void usage(void) 
 {
-    printf("Usage: shell [-hvp]\n");
-    printf("   -h   print this message\n");
-    printf("   -v   print additional diagnostic information\n");
-    printf("   -p   do not emit a command prompt\n");
+    print("Usage: shell [-hvp]\n");
+    print("   -h   print this message\n");
+    print("   -v   print additional diagnostic information\n");
+    print("   -p   do not emit a command prompt\n");
     exit(1);
 }
 

@@ -17,12 +17,9 @@
 #include <errno.h>
 
 #include <string>
+#include <vector>
 
-
-
-
-
-
+#include "jobs.h"
 
 
 /* Misc manifest constants */
@@ -31,24 +28,11 @@
 #define MAXJOBS      16   /* max jobs at any point in time */
 #define MAXJID    1<<16   /* max job ID */
 
-// /* Job states */
-// #define UNDEF 0 /* undefined */
-// #define FG 1    /* running in foreground */
-// #define BG 2    /* running in background */
-// #define ST 3    /* stopped */
 
 
 
 
-/* Global variables */
-extern char **environ;      /* defined in libc */
-int nextjid = 1;            /* next job ID to allocate */
-char sbuf[MAXLINE];         /* for composing sprintf messages */
-struct job_t jobs[MAXJOBS]; /* The job list */
-const std::string prompt = "tsh> ";    /* command line prompt (DO NOT CHANGE) */
-bool verbose = false;           /* if true, print additional output */
-volatile sig_atomic_t FG_PID_GLOBALS;
-/* End global variables */
+
 
 // #define BLOCK(set, old_set) / 
 //         Sigprocmask(SIG_BLOCK, &(set), &(old_set))
@@ -56,6 +40,9 @@ volatile sig_atomic_t FG_PID_GLOBALS;
 //         Sigprocmask(SIG_BLOCK, &(set), NULL)
 // #define UNBLOCK(old_set) /
 //         Sigprocmask(SIG_SETMASK, &(old_set), NULL)
+
+
+
 
 /* Function prototypes */
 

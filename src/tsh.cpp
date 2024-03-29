@@ -1,4 +1,7 @@
 #include "tsh.h"
+
+using std::vector;
+using std::string;
 /* 
  * eval - Evaluate the command line that the user has just typed in
  * 
@@ -67,157 +70,160 @@ void eval(char *cmdline)
    }
  }
 
-/* 
- * parseline - Parse the command line and build the argv array.
- * 
- * Characters enclosed in single quotes are treated as a single
- * argument.  Return true if the user has requested a BG job, false if
- * the user has requested a FG job.  
- */
-int parseline(const char *cmdline, char **argv) 
-{
-    static char array[MAXLINE]; /* holds local copy of command line */
-    char *buf = array;          /* ptr that traverses command line */
-    char *delim;                /* points to first space delimiter */
-    int argc;                   /* number of args */
-    int bg;                     /* background job? */
+// /* 
+//  * parseline - Parse the command line and build the argv array.
+//  * 
+//  * Characters enclosed in single quotes are treated as a single
+//  * argument.  Return true if the user has requested a BG job, false if
+//  * the user has requested a FG job.  
+//  */
+// int parseline(const char *cmdline, char **argv) 
+// {
+//     static char array[MAXLINE]; /* holds local copy of command line */
+//     char *buf = array;          /* ptr that traverses command line */
+//     char *delim;                /* points to first space delimiter */
+//     int argc;                   /* number of args */
+//     int bg;                     /* background job? */
 
-    strcpy(buf, cmdline);
-    buf[strlen(buf)-1] = ' ';  /* replace trailing '\n' with space */
-    while (*buf && (*buf == ' ')) /* ignore leading spaces */
-	buf++;
+//     strcpy(buf, cmdline);
+//     buf[strlen(buf)-1] = ' ';  /* replace trailing '\n' with space */
+//     while (*buf && (*buf == ' ')) /* ignore leading spaces */
+// 	buf++;
 
-    /* Build the argv list */
-    argc = 0;
-    if (*buf == '\'') {
-	buf++;
-	delim = strchr(buf, '\'');
-    }
-    else {
-	delim = strchr(buf, ' ');
-    }
+//     /* Build the argv list */
+//     argc = 0;
+//     if (*buf == '\'') {
+// 	buf++;
+// 	delim = strchr(buf, '\'');
+//     }
+//     else {
+// 	delim = strchr(buf, ' ');
+//     }
 
-    while (delim) {
-	argv[argc++] = buf;
-	*delim = '\0';
-	buf = delim + 1;
-	while (*buf && (*buf == ' ')) /* ignore spaces */
-	       buf++;
+//     while (delim) {
+// 	argv[argc++] = buf;
+// 	*delim = '\0';
+// 	buf = delim + 1;
+// 	while (*buf && (*buf == ' ')) /* ignore spaces */
+// 	       buf++;
 
-	if (*buf == '\'') {
-	    buf++;
-	    delim = strchr(buf, '\'');
-	}
-	else {
-	    delim = strchr(buf, ' ');
-	}
-    }
-    argv[argc] = NULL;
+// 	if (*buf == '\'') {
+// 	    buf++;
+// 	    delim = strchr(buf, '\'');
+// 	}
+// 	else {
+// 	    delim = strchr(buf, ' ');
+// 	}
+//     }
+//     argv[argc] = NULL;
     
-    if (argc == 0)  /* ignore blank line */
-	return 1;
+//     if (argc == 0)  /* ignore blank line */
+// 	return 1;
 
-    /* should the job run in the background? */
-    if ((bg = (*argv[argc-1] == '&')) != 0) {
-	argv[--argc] = NULL;
-    }
-    return bg;
-}
+//     /* should the job run in the background? */
+//     if ((bg = (*argv[argc-1] == '&')) != 0) {
+// 	argv[--argc] = NULL;
+//     }
+//     return bg;
+// }
 
 /* 
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-int builtin_cmd(char **argv) 
- {
+bool isbuiltinCommand(const string &cmd_name) {
+
+    if (cmd_name == "quit")
+        exit(0);
+    else if (cmd_name == "&")   // Ignore singleton &. nothing is happen.
+        return true;
+    return false;               /* not a builtin command */
+//    if (!strcmp(argv[0], "quit"))// quit command.
+//      exit(0); 
+//    else if (!strcmp(argv[0], "&")) 
+//      return 1; 
+//    else if (!strcmp(argv[0], "jobs")){// jobs command.
+//      sigset_t mask_all, prev_all;
+//      Sigfillset(&mask_all);
  
-   if (!strcmp(argv[0], "quit"))// quit command.
-     exit(0); 
-   else if (!strcmp(argv[0], "&")) // Ignore singleton &. nothing is happen.
-     return 1; 
-   else if (!strcmp(argv[0], "jobs")){// jobs command.
-     sigset_t mask_all, prev_all;
-     Sigfillset(&mask_all);
- 
-     BLOCK(mask_all, prev_all);
-     listjobs(jobs);
-     UNBLOCK(prev_all);
+//      BLOCK(mask_all, prev_all);
+//      listjobs(jobs);
+//      UNBLOCK(prev_all);
      
-     return 1; 
-   }
-  else if (!strcmp(argv[0], "bg") || !strcmp(argv[0], "fg")){ // bg or fg commands.
-   do_bgfg(argv);
-   return 1;
- }
-   return 0;     /* not a builtin command */
- }
+//      return 1; 
+//    }
+//   else if (!strcmp(argv[0], "bg") || !strcmp(argv[0], "fg")){ // bg or fg commands.
+//    do_bgfg(argv);
+//    return 1;
+//  }
+}
 
-/* 
- * do_bgfg - Execute the builtin bg and fg commands
- */
-void do_bgfg(char **argv) 
- {
-   struct job_t *job;
-   int id;
-   sigset_t mask_all, prev_all;
-   Sigfillset(&mask_all);
+// /* 
+//  * do_bgfg - Execute the builtin bg and fg commands
+//  */
+// void do_bgfg(char **argv) 
+//  {
+//    struct job_t *job;
+//    int id;
+//    sigset_t mask_all, prev_all;
+//    Sigfillset(&mask_all);
  
-   if (argv[1] == NULL){
-     // single fg or bg.
-     printf("%s command requires PID or %%jobid argument\n", argv[0]);
-     return;
-   }
-   else if (sscanf(argv[1], "%%%d", &id) > 0){
-     BLOCK(mask_all, prev_all);
-     job = getjobjid(jobs, id);
-     UNBLOCK(prev_all);
+//    if (argv[1] == NULL){
+//      // single fg or bg.
+//      printf("%s command requires PID or %%jobid argument\n", argv[0]);
+//      return;
+//    }
+//    else if (sscanf(argv[1], "%%%d", &id) > 0){
+//      BLOCK(mask_all, prev_all);
+//      job = getjobjid(jobs, id);
+//      UNBLOCK(prev_all);
  
-     if (job == NULL){
-       // not found the job.
-       printf("%%%d: No such job\n", id);
-       return;
-     }
-   }
-   else if(sscanf(argv[1], "%d", &id) > 0){
-     BLOCK(mask_all, prev_all);
-     job = getjobpid(jobs, id);
-     UNBLOCK(prev_all); 
+//      if (job == NULL){
+//        // not found the job.
+//        printf("%%%d: No such job\n", id);
+//        return;
+//      }
+//    }
+//    else if(sscanf(argv[1], "%d", &id) > 0){
+//      BLOCK(mask_all, prev_all);
+//      job = getjobpid(jobs, id);
+//      UNBLOCK(prev_all); 
  
-     if (job == NULL){
-       printf("(%d): No such process\n", id);
-       return;
-     }
-   }
-   else{
-     // not pid or jid.
-     printf("%s: argument must be a PID or %%jobid\n", argv[0]);
-     return;
-   }
+//      if (job == NULL){
+//        printf("(%d): No such process\n", id);
+//        return;
+//      }
+//    }
+//    else{
+//      // not pid or jid.
+//      printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+//      return;
+//    }
  
-   if (!strcmp(argv[0], "bg")){
-     kill(-(job->pid), SIGCONT);
-     job->state = BG;
-     printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-   }
-   else if (!strcmp(argv[0], "fg")){
-     kill(-(job->pid), SIGCONT);
-     job->state = FG;
-     waitfg(job->pid);
-   }
- }
+//    if (!strcmp(argv[0], "bg")){
+//      kill(-(job->pid), SIGCONT);
+//      job->state = BG;
+//      printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+//    }
+//    else if (!strcmp(argv[0], "fg")){
+//      kill(-(job->pid), SIGCONT);
+//      job->state = FG;
+//      waitfg(job->pid);
+//    }
+//  }
 
-/* 
- * waitfg - Block until process pid is no longer the foreground process
- */
-void waitfg(pid_t pid)
- {
-   sigset_t mask;
-   sigemptyset(&mask);
+// /* 
+//  * waitfg - Block until process pid is no longer the foreground process
+//  */
+// void waitfg(pid_t pid)
+//  {
+//    sigset_t mask;
+//    sigemptyset(&mask);
  
-   FG_PID_GLOBALS = 0;
-   while (!FG_PID_GLOBALS)
-     sigsuspend(&mask);
- }
+//    FG_PID_GLOBALS = 0;
+//    while (!FG_PID_GLOBALS)
+//      sigsuspend(&mask);
+//  }
 
 
 
