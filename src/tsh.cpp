@@ -1,4 +1,4 @@
-#include "tsh.hpp"
+#include "tsh.h"
 /* 
  * eval - Evaluate the command line that the user has just typed in
  * 
@@ -145,6 +145,10 @@ int builtin_cmd(char **argv)
      
      return 1; 
    }
+  else if (!strcmp(argv[0], "bg") || !strcmp(argv[0], "fg")){ // bg or fg commands.
+   do_bgfg(argv);
+   return 1;
+ }
    return 0;     /* not a builtin command */
  }
 
@@ -152,9 +156,55 @@ int builtin_cmd(char **argv)
  * do_bgfg - Execute the builtin bg and fg commands
  */
 void do_bgfg(char **argv) 
-{
-    return;
-}
+ {
+   struct job_t *job;
+   int id;
+   sigset_t mask_all, prev_all;
+   Sigfillset(&mask_all);
+ 
+   if (argv[1] == NULL){
+     // single fg or bg.
+     printf("%s command requires PID or %%jobid argument\n", argv[0]);
+     return;
+   }
+   else if (sscanf(argv[1], "%%%d", &id) > 0){
+     BLOCK(mask_all, prev_all);
+     job = getjobjid(jobs, id);
+     UNBLOCK(prev_all);
+ 
+     if (job == NULL){
+       // not found the job.
+       printf("%%%d: No such job\n", id);
+       return;
+     }
+   }
+   else if(sscanf(argv[1], "%d", &id) > 0){
+     BLOCK(mask_all, prev_all);
+     job = getjobpid(jobs, id);
+     UNBLOCK(prev_all); 
+ 
+     if (job == NULL){
+       printf("(%d): No such process\n", id);
+       return;
+     }
+   }
+   else{
+     // not pid or jid.
+     printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+     return;
+   }
+ 
+   if (!strcmp(argv[0], "bg")){
+     kill(-(job->pid), SIGCONT);
+     job->state = BG;
+     printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+   }
+   else if (!strcmp(argv[0], "fg")){
+     kill(-(job->pid), SIGCONT);
+     job->state = FG;
+     waitfg(job->pid);
+   }
+ }
 
 /* 
  * waitfg - Block until process pid is no longer the foreground process

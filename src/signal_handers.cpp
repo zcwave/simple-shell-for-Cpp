@@ -1,4 +1,5 @@
-
+#include "tsh.h"
+#include "jobs.h"
 /*****************
  * Signal handlers
  *****************/
@@ -11,7 +12,7 @@
  *     currently running children to terminate.  
  */
 void sigchld_handler(int sig) 
-{
+ {
    int old_errno = errno;
    pid_t pid;
    int status;
@@ -23,12 +24,33 @@ void sigchld_handler(int sig)
    {
      BLOCK(mask_all, prev_all);
      struct job_t *job = getjobpid(jobs, pid);
+ 
      if (pid == fgpid(jobs)){
-       FG_PID_G = pid;
+       FG_PID_GLOBALS = pid;
      }
-     deletejob(jobs, pid);
+ 
+     if (WIFEXITED(status))  // Normal: delete job
+     {
+       deletejob(jobs, pid);
+     }
+     else if (WIFSIGNALED(status))  // C^C: print,and delete job
+     {
+       printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, WTERMSIG(status));
+       deletejob(jobs, pid);
+     }
+     else if (WIFSTOPPED(status)) // C^Z: print,and moditfy job state.
+     {
+       printf("Job [%d] (%d) stopped by signal %d\n", job->jid, job->pid, WSTOPSIG(status));
+       job->state = ST;
+     }
+     else{
+       deletejob(jobs, pid);
+       printf("hahaha\n");
+     }
+ 
      UNBLOCK(prev_all);
    }
+ 
    errno = old_errno;
  }
 /* 
@@ -37,20 +59,31 @@ void sigchld_handler(int sig)
  *    to the foreground job.  
  */
 void sigint_handler(int sig) 
-{
-    return;
-}
+ {
+   int old_errno = errno;
+   
+   pid_t pid = fgpid(jobs);
+   if (pid != 0)
+     kill(-pid, sig);
+     
+   errno = old_errno;
+ }
 
 /*
  * sigtstp_handler - The kernel sends a SIGTSTP to the shell whenever
  *     the user types ctrl-z at the keyboard. Catch it and suspend the
  *     foreground job by sending it a SIGTSTP.  
  */
-void sigtstp_handler(int sig) 
-{
-    return;
-}
-
+ void sigtstp_handler(int sig) 
+ {
+   int old_errno = errno;
+   pid_t pid = fgpid(jobs);
+ 
+   if (pid != 0)
+     kill(-pid, sig);
+ 
+   errno = old_errno;
+ }
 /*********************
  * End signal handlers
  *********************/
