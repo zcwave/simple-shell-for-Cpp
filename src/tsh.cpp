@@ -85,6 +85,7 @@ JobState parseline(string &cmdline, std::vector<const char*> &argv) {
     std::istringstream iss(cmdline);
     std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                     std::istream_iterator<std::string>{}};
+    // tokens.push_back(""); // 表示ARGV中的 NULL 结尾
     for (auto x : tokens) {
         argv.push_back(x.c_str());
     }

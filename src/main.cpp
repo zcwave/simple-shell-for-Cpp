@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     // initjobs(jobs);
 
     
-    std::string commandLine{};
+    std::string command_line{};
     using std::cin;
     using std::flush;
     using std::cout;
@@ -68,22 +68,17 @@ int main(int argc, char **argv) {
         if (emit_prompt) {
             cout << prompt << flush;
         }
-        if (!std::getline(cin, commandLine)) {
-            throw std::runtime_error("getline error");
+        if (!std::getline(cin, command_line)) {
+            if (cin.eof()) { /* End of file (ctrl-d) */
+                cout << flush;
+                exit(0);
+            }
+            else throw std::runtime_error("getline error");
         }
-        if (cin.eof()) { /* End of file (ctrl-d) */
-            cout << flush;
-            exit(0);
-        }
-        // if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin))
-        //     app_error("fgets error");
-        // if (feof(stdin)) { 
-        //     fflush(stdout);
-        //     exit(0);
-        // }
 
         /* Evaluate the command line */
-        eval(commandLine);
+        //? DEBUG: cout << command_line << std::endl;
+        eval(command_line);
         fflush(stdout);
         fflush(stdout);
     } 
