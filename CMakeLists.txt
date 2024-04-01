@@ -18,12 +18,13 @@ set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 
 add_library(tshlib SHARED
-    ${LIB_DIR}/userlib.cpp ${LIB_DIR}/userlib.h
+    ${LIB_DIR}/tshlib.cpp ${LIB_DIR}/tshlib.h
 )
 
 # 添加可执行文件，并指定源文件
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp ${SRC_DIR}/tsh.cpp
+    ${SRC_DIR}/signal_handlers.cpp 
 )
 
 # 指定头文件目录

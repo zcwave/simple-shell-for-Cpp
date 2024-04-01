@@ -14,22 +14,18 @@ using std::string;
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
 void eval(const std::string_view command_line) { 
-    std::vector<const char *> argv{"/bin/ls", "-l"}; // argument list exec()
+    std::vector<const char *> argv {"bin/ls", "-l"}; // argument list exec()
     std::string buf {command_line};// Holds modified commmand line.
 
 
-   // auto bg {parseline(buf ,argv)}; // should the job run in bg or fg?
-  //  pid_t pid;
- 
-  //  strcpy(buf, cmdline);
-  //  bg = parseline(buf, argv); 
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
+    // auto state { parseline(buf ,argv) }; // should the job run in bg or fg?
  
-  //  if (argv[0] == NULL)
-  //    return; // Ignore empty lines.
+   if (argv[0] == string{})
+     return; // Ignore empty lines.
  
  
-  //  if (!isbuiltinCommand(argv)){
+   if (!isbuiltinCommand(argv[0])) {
  
     //  sigset_t mask_all;
     //  sigset_t mask_one, prev_one;
@@ -40,46 +36,41 @@ void eval(const std::string_view command_line) {
      
     //  BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
-    if (auto pid = fork()){
-
-    }
-    else {
-        setpgid(0, 0);
-        if (execve(argv[0], const_cast<char * const *>(argv.data()), environ) < 0) {
-            std::cout << argv[0] << ": Command not found. " << std::endl;
-            exit(0);
+        if (auto pid = fork()) {
+            // auto state = bg ? BG : FG;
+            // BLOCK_NOT_SAVE_OLD_SET(mask_all);
+            // addjob(jobs, pid, state, cmdline);
+            // UNBLOCK(prev_one); // Unblock SIGCHLD.
+        
+            // /* Parent waits for fg job to terminate.*/
+            // if (!bg){
+            //     waitfg(pid);
+            // }
+            // else {
+                // the job is bg.
+            //     BLOCK_NOT_SAVE_OLD_SET(mask_all);
+            //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+            // }  
+            // UNBLOCK(prev_one);//Unblock all signal
         }
-    }
+        else {
+        // child runs user job.
+        // UNBLOCK(prev_one); //Unblock SIGCHLD.
+            setpgid(0, 0);
+            if (execve(argv[0], 
+                       const_cast<char * const *>(argv.data()), 
+                       environ) < 0) 
+            {
+                std::cout << argv[0] << ": Command not found. " << std::endl;
+                exit(0);
+            }
+        }
     
  
-  //    if (pid == 0){
-  //      // child runs user job.
-  //      UNBLOCK(prev_one); //Unblock SIGCHLD.
-  //      setpgid(0, 0);
-  //      if (execve(argv[0], argv, environ) < 0){
-  //        printf("%s: Command not found. \n", argv[0]);
-  //        exit(0);
-  //      }
-  //    }
-  //    else {
-  //      int state = bg ? BG : FG;
-  //      BLOCK_NOT_SAVE_OLD_SET(mask_all);
-  //      addjob(jobs, pid, state, cmdline);
-  //      UNBLOCK(prev_one); // Unblock SIGCHLD.
  
-  //      /* Parent waits for fg job to terminate.*/
-  //      if (!bg){
-  //        waitfg(pid);
-  //      }
-  //      else {
-  //        // the job is bg.
-  //        BLOCK_NOT_SAVE_OLD_SET(mask_all);
-  //        printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
-  //      }  
-  //      UNBLOCK(prev_one);//Unblock all signal
-  //    } 
-  //  }
- }
+
+    }
+}
 
 /* 
  * parseline - Parse the command line and build the argv array.
@@ -88,8 +79,7 @@ void eval(const std::string_view command_line) {
  * argument.  Return true if the user has requested a BG job, false if
  * the user has requested a FG job.  
  */
-int parseline(const char *cmdline, char **argv) {
-    return 0;
+// JobState parseline(string &cmdline, std::vector<const char *> &argv) {
 //     static char array[MAXLINE]; /* holds local copy of command line */
 //     char *buf = array;          /* ptr that traverses command line */
 //     char *delim;                /* points to first space delimiter */
@@ -104,11 +94,11 @@ int parseline(const char *cmdline, char **argv) {
 //     /* Build the argv list */
 //     argc = 0;
 //     if (*buf == '\'') {
-// 	buf++;
-// 	delim = strchr(buf, '\'');
+//         buf++;
+//         delim = strchr(buf, '\'');
 //     }
 //     else {
-// 	delim = strchr(buf, ' ');
+//         delim = strchr(buf, ' ');
 //     }
 
 //     while (delim) {
@@ -121,22 +111,22 @@ int parseline(const char *cmdline, char **argv) {
 // 	if (*buf == '\'') {
 // 	    buf++;
 // 	    delim = strchr(buf, '\'');
-// 	}
-// 	else {
+// 	} else {
 // 	    delim = strchr(buf, ' ');
 // 	}
 //     }
 //     argv[argc] = NULL;
     
 //     if (argc == 0)  /* ignore blank line */
-// 	return 1;
+//         return UNDEF; //!!!!!! 占位符，更改
+        
 
 //     /* should the job run in the background? */
 //     if ((bg = (*argv[argc-1] == '&')) != 0) {
 // 	argv[--argc] = NULL;
 //     }
-//     return bg;
-}
+//     return BG;
+// }
 
 /* 
  * builtin_cmd - If the user has typed a built-in command then execute
@@ -144,15 +134,12 @@ int parseline(const char *cmdline, char **argv) {
  */
 bool isbuiltinCommand(const std::string_view cmd_name) {
 
-    if (cmd_name == "quit")
+    if (cmd_name == "quit") // quit command.
         exit(0);
     else if (cmd_name == "&")   // Ignore singleton &. nothing is happen.
         return true;
     return false;               /* not a builtin command */
-//    if (!strcmp(argv[0], "quit"))// quit command.
-//      exit(0); 
-//    else if (!strcmp(argv[0], "&")) 
-//      return 1; 
+
 //    else if (!strcmp(argv[0], "jobs")){// jobs command.
 //      sigset_t mask_all, prev_all;
 //      Sigfillset(&mask_all);

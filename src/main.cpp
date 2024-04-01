@@ -1,4 +1,5 @@
 #include "tsh.h"
+#include "Signal.hpp"
 // #include "userlib.h"
 /*
  * main - The shell's main routine 
@@ -51,7 +52,7 @@ int main(int argc, char **argv) {
     // Signal(SIGCHLD, sigchld_handler);  /* Terminated or stopped child */
 
     // /* This one provides a clean way to kill the shell */
-    // Signal(SIGQUIT, sigquit_handler); 
+    Signal(SIGQUIT, sigquit_handler); 
 
     // /* Initialize the job list */
     // initjobs(jobs);
