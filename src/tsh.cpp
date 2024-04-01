@@ -15,19 +15,16 @@ using std::string;
  * background children don't receive SIGINT (SIGTSTP) from the kernel
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
-void eval(const std::string_view command_line) { 
+void eval(const std::string &command_line) { 
     std::vector<const char *> argv{}; // argument list exec()
-    std::string buf {command_line};// Holds modified commmand line.
-
-
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
-    auto state { parseline(buf ,argv) }; // should the job run in bg or fg?
+    auto state { parseline(command_line ,argv) }; // should the job run in bg or fg?
  
     if (argv[0] == string{})
         return; // Ignore empty lines.
  
  
-    if (!isbuiltinCommand(argv[0])) {
+    if (!isbuiltinCommand(argv)) {
  
     //  sigset_t mask_all;
     //  sigset_t mask_one, prev_one;
@@ -80,7 +77,8 @@ void eval(const std::string_view command_line) {
  * the user has requested a FG job.  
  */
 
-JobState parseline(string &cmdline, std::vector<const char*> &argv) {
+JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
+
 
     std::istringstream iss(cmdline);
     std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
@@ -149,28 +147,27 @@ JobState parseline(string &cmdline, std::vector<const char*> &argv) {
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-bool isbuiltinCommand(const std::string_view cmd_name) {
+bool isbuiltinCommand(const std::vector<const char *> argv) {
 
+    string cmd_name = argv[0];
     if (cmd_name == "quit") // quit command.
         exit(0);
     else if (cmd_name == "&")   // Ignore singleton &. nothing is happen.
         return true;
-    return false;               /* not a builtin command */
-
-//    else if (!strcmp(argv[0], "jobs")){// jobs command.
+    else if (cmd_name == "jobs") { // jobs command.
 //      sigset_t mask_all, prev_all;
 //      Sigfillset(&mask_all);
  
 //      BLOCK(mask_all, prev_all);
 //      listjobs(jobs);
 //      UNBLOCK(prev_all);
-     
-//      return 1; 
-//    }
-//   else if (!strcmp(argv[0], "bg") || !strcmp(argv[0], "fg")){ // bg or fg commands.
-//    do_bgfg(argv);
-//    return 1;
-//  }
+        return true;
+    }
+    else if (cmd_name == "bg" || cmd_name == "fg") { // bg or fg commands.
+        // do_bgfg(argv);
+        return true;
+    }
+    return false;               /* not a builtin command */
 }
 
 // /* 

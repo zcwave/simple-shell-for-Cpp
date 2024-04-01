@@ -49,9 +49,9 @@ constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */
 // /* Function prototypes */
 
 // /* Here are the functions that you will implement */
-void eval(const std::string_view command_line);  
-bool isbuiltinCommand(const std::string_view cmd_name);
-JobState parseline(std::string &cmdline, std::vector<const char *> &argv); 
+void eval(const std::string &command_line);  
+bool isbuiltinCommand(const std::vector<const char *> argv);
+JobState parseline(const std::string &cmdline, std::vector<const char *> &argv); 
 // void do_bgfg(char **argv);
 // void waitfg(pid_t pid);
 
