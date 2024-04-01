@@ -14,10 +14,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 设置源文件目录
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-# add_library(tsh SHARED
-#     ${SRC_DIR}/tsh.cpp ${INCLUDE_DIR}/tsh.hpp
-# )
+
+add_library(tshlib SHARED
+    ${LIB_DIR}/userlib.cpp ${LIB_DIR}/userlib.h
+)
 
 # 添加可执行文件，并指定源文件
 add_executable(${PROJECT_NAME}
@@ -26,14 +28,14 @@ add_executable(${PROJECT_NAME}
 
 # 指定头文件目录
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${INCLUDE_DIR}
+    ${INCLUDE_DIR} ${LIB_DIR}
 )
 
 # target_include_directories(tsh PUBLIC
 #     ${INCLUDE_DIR}
 # )
 
-# # 链接动态库
-# target_link_libraries(${PROJECT_NAME} PRIVATE
-#     tsh
-# )
+# 链接动态库
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    tshlib
+)

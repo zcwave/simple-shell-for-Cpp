@@ -14,7 +14,7 @@ using std::string;
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
 void eval(const std::string_view command_line) { 
-    std::vector<const char *> argv{"ls", "-l"}; // argument list exec()
+    std::vector<const char *> argv{"/bin/ls", "-l"}; // argument list exec()
     std::string buf {command_line};// Holds modified commmand line.
 
 
@@ -46,7 +46,8 @@ void eval(const std::string_view command_line) {
     else {
         setpgid(0, 0);
         if (execve(argv[0], const_cast<char * const *>(argv.data()), environ) < 0) {
-          std::cout << argv[0] << ": Command not found. " << std::endl;
+            std::cout << argv[0] << ": Command not found. " << std::endl;
+            exit(0);
         }
     }
     
