@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
         if (emit_prompt) {
             cout << prompt << flush;
         }
-        if (std::getline(cin, commandLine)) {
-
+        if (!std::getline(cin, commandLine)) {
+            throw std::runtime_error("getline error");
         }
         if (cin.eof()) { /* End of file (ctrl-d) */
             cout << flush;
@@ -88,4 +88,3 @@ int main(int argc, char **argv) {
 
     exit(0); /* control never reaches here */
 }
-  

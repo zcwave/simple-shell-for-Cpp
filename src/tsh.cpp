@@ -14,15 +14,16 @@ using std::string;
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
 void eval(const std::string_view command_line) { 
-    std::vector<std::string> argv{"ls", "-l"}; // argument list exec()
+    std::vector<const char *> argv{"ls", "-l"}; // argument list exec()
+    std::string buf {command_line};// Holds modified commmand line.
 
-  //  char buf[MAXLINE]; // Holds modified commmand line.
-  //  int bg; // should the job run in bg or fg?
+
+   // auto bg {parseline(buf ,argv)}; // should the job run in bg or fg?
   //  pid_t pid;
  
   //  strcpy(buf, cmdline);
   //  bg = parseline(buf, argv); 
-  //  // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
+   // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
  
   //  if (argv[0] == NULL)
   //    return; // Ignore empty lines.
@@ -44,7 +45,7 @@ void eval(const std::string_view command_line) {
     }
     else {
         setpgid(0, 0);
-        if (execve(argv[0].c_str(), argv.data().c_str(), environ) < 0) {
+        if (execve(argv[0], const_cast<char * const *>(argv.data()), environ) < 0) {
           std::cout << argv[0] << ": Command not found. " << std::endl;
         }
     }
@@ -79,15 +80,15 @@ void eval(const std::string_view command_line) {
   //  }
  }
 
-// /* 
-//  * parseline - Parse the command line and build the argv array.
-//  * 
-//  * Characters enclosed in single quotes are treated as a single
-//  * argument.  Return true if the user has requested a BG job, false if
-//  * the user has requested a FG job.  
-//  */
-// int parseline(const char *cmdline, char **argv) 
-// {
+/* 
+ * parseline - Parse the command line and build the argv array.
+ * 
+ * Characters enclosed in single quotes are treated as a single
+ * argument.  Return true if the user has requested a BG job, false if
+ * the user has requested a FG job.  
+ */
+int parseline(const char *cmdline, char **argv) {
+    return 0;
 //     static char array[MAXLINE]; /* holds local copy of command line */
 //     char *buf = array;          /* ptr that traverses command line */
 //     char *delim;                /* points to first space delimiter */
@@ -134,7 +135,7 @@ void eval(const std::string_view command_line) {
 // 	argv[--argc] = NULL;
 //     }
 //     return bg;
-// }
+}
 
 /* 
  * builtin_cmd - If the user has typed a built-in command then execute
