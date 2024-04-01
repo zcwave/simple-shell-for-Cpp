@@ -1,4 +1,6 @@
 #include "tsh.h"
+#include <iterator>
+#include <sstream>
 
 using std::vector;
 using std::string;
@@ -14,18 +16,18 @@ using std::string;
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
 void eval(const std::string_view command_line) { 
-    std::vector<const char *> argv {"bin/ls", "-l"}; // argument list exec()
+    std::vector<const char *> argv{}; // argument list exec()
     std::string buf {command_line};// Holds modified commmand line.
 
 
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
-    // auto state { parseline(buf ,argv) }; // should the job run in bg or fg?
+    auto state { parseline(buf ,argv) }; // should the job run in bg or fg?
  
-   if (argv[0] == string{})
-     return; // Ignore empty lines.
+    if (argv[0] == string{})
+        return; // Ignore empty lines.
  
  
-   if (!isbuiltinCommand(argv[0])) {
+    if (!isbuiltinCommand(argv[0])) {
  
     //  sigset_t mask_all;
     //  sigset_t mask_one, prev_one;
@@ -65,9 +67,7 @@ void eval(const std::string_view command_line) {
                 exit(0);
             }
         }
-    
- 
- 
+
 
     }
 }
@@ -79,6 +79,22 @@ void eval(const std::string_view command_line) {
  * argument.  Return true if the user has requested a BG job, false if
  * the user has requested a FG job.  
  */
+
+JobState parseline(string &cmdline, std::vector<const char*> &argv) {
+
+    std::istringstream iss(cmdline);
+    std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
+                                    std::istream_iterator<std::string>{}};
+    for (auto x : tokens) {
+        argv.push_back(x.c_str());
+    }
+//     /* should the job run in the background? */
+//     if ((bg = (*argv[argc-1] == '&')) != 0) {
+//         argv[--argc] = NULL;
+//     }
+//     return BG;
+    return BG;
+}
 // JobState parseline(string &cmdline, std::vector<const char *> &argv) {
 //     static char array[MAXLINE]; /* holds local copy of command line */
 //     char *buf = array;          /* ptr that traverses command line */
@@ -123,7 +139,7 @@ void eval(const std::string_view command_line) {
 
 //     /* should the job run in the background? */
 //     if ((bg = (*argv[argc-1] == '&')) != 0) {
-// 	argv[--argc] = NULL;
+//         argv[--argc] = NULL;
 //     }
 //     return BG;
 // }
