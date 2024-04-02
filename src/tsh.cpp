@@ -20,6 +20,10 @@ void eval(const std::string &command_line) {
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
     auto state { parseline(command_line ,argv) }; // should the job run in bg or fg?
  
+    //? DEBUG
+    // for (auto x : argv) {
+    //     std::cout << x << std::endl;
+    // }
     if (argv[0] == string{})
         return; // Ignore empty lines.
  
@@ -64,9 +68,8 @@ void eval(const std::string &command_line) {
                 exit(0);
             }
         }
-
-
     }
+    return;
 }
 
 /* 
@@ -83,10 +86,18 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
     std::istringstream iss(cmdline);
     std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                     std::istream_iterator<std::string>{}};
-    // tokens.push_back(""); // 表示ARGV中的 NULL 结尾
-    for (auto x : tokens) {
+    tokens.push_back(string{}); // 表示ARGV中的 NULL 结尾
+    for (auto &x : tokens) {
         argv.push_back(x.c_str());
     }
+    // //? DEBUG
+    // for (auto x : tokens) {
+    //     std::cout << x << std::endl;
+    // }
+    // for (auto x : argv) {
+    //     std::cout << x << std::endl;
+    // }
+
 //     /* should the job run in the background? */
 //     if ((bg = (*argv[argc-1] == '&')) != 0) {
 //         argv[--argc] = NULL;
