@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
         /* Evaluate the command line */
         //? DEBUG: cout << command_line << std::endl;
-        eval(command_line);
+        eval(command_line); //! have a BUG
         cout << flush;
         cout << flush;
     } 
