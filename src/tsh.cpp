@@ -1,23 +1,15 @@
-#include "tsh.h"
 #include <iterator>
 #include <sstream>
 #include <cassert>
 #include <sys/wait.h>
 #include <iostream>
 
+#include "tsh.h"
+
 using std::vector, std::string;
-/* 
- * eval - Evaluate the command line that the user has just typed in
- * 
- * If the user has requested a built-in command (quit, jobs, bg or fg)
- * then execute it immediately. Otherwise, fork a child process and
- * run the job in the context of the child. If the job is running in
- * the foreground, wait for it to terminate and then return.  Note:
- * each child process must have a unique process group ID so that our
- * background children don't receive SIGINT (SIGTSTP) from the kernel
- * when we type ctrl-c (ctrl-z) at the keyboard.  
-*/
-void eval(auto command) { 
+
+
+void eval(auto&& command) { 
 
     if (command.size() == 0) {
         return; // Ignore empty lines.
@@ -79,7 +71,7 @@ decltype(auto) parseline(auto&& cmdline, auto&& argv) {
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-bool isbuiltinCommand(auto argv) {
+bool isbuiltinCommand(auto&& argv) {
 
     string cmd_name = argv[0];
     if (cmd_name == "quit") // quit command.

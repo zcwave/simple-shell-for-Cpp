@@ -14,7 +14,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 设置源文件目录
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 
 # 默认采用Release模式
@@ -23,27 +22,26 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-add_library(tshlib SHARED
-    ${LIB_DIR}/tshlib.cpp ${LIB_DIR}/tshlib.h
-)
+add_subdirectory(lib)
 
 # 添加可执行文件，并指定源文件
 add_executable(${PROJECT_NAME}
-    ${SRC_DIR}/main.cpp ${SRC_DIR}/tsh.cpp
-    ${SRC_DIR}/signal_handlers.cpp 
-    ${SRC_DIR}/Jobs.cpp 
+    ${SRC_DIR}/main.cpp 
+    ${SRC_DIR}/tsh.cpp
 )
 
 # 指定头文件目录
-target_include_directories(${PROJECT_NAME} PUBLIC
-    ${INCLUDE_DIR} ${LIB_DIR}
+target_include_directories(
+    ${PROJECT_NAME} 
+
+    PUBLIC
+    ${INCLUDE_DIR} 
 )
 
-# target_include_directories(tsh PUBLIC
-#     ${INCLUDE_DIR}
-# )
-
 # 链接动态库
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    tshlib
+target_link_libraries(
+    ${PROJECT_NAME} 
+
+    PRIVATE
+    utilities
 )
