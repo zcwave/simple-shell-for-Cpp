@@ -27,7 +27,6 @@ add_subdirectory(lib)
 # 添加可执行文件，并指定源文件
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp 
-    ${SRC_DIR}/tsh.cpp
 )
 
 # 指定头文件目录

@@ -114,5 +114,5 @@ decltype(auto) parseline(auto&& cmdline, auto&& argv) {
 }
 
 
-// in "lib/tshlib.h"
+// in "lib/utilities.h"
 void usage(void);
