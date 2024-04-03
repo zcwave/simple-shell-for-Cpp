@@ -1,6 +1,7 @@
 #include "tsh.h"
 #include "jobs_types.h"
 #include "Signal.hpp"
+#include "Jobs.hpp"
 
 using std::cout, std::endl;
 /*****************
@@ -60,15 +61,14 @@ using std::cout, std::endl;
  *    to the foreground job.  
  */
 void sigint_handler(int sig) {
-    cout << "sigint_handler...." << endl;
-  //  int old_errno = errno;
-   
-  //  pid_t pid = fgpid(jobs);
-  //  if (pid != 0)
-  //    kill(-pid, sig);
-     
-  //  errno = old_errno;
- }
+
+    int old_errno = errno;
+        
+    auto pid = Jobs::getInstance().getFgPid();
+    if (pid != 0)
+        kill(-pid, sig);
+    errno = old_errno;
+}
 
 /*
  * sigtstp_handler - The kernel sends a SIGTSTP to the shell whenever
@@ -76,15 +76,13 @@ void sigint_handler(int sig) {
  *     foreground job by sending it a SIGTSTP.  
  */
 void sigtstp_handler(int sig) {
-    cout << "sigtstp_handler...." << endl;
-  //  int old_errno = errno;
-  //  pid_t pid = fgpid(jobs);
- 
-  //  if (pid != 0)
-  //    kill(-pid, sig);
- 
-  //  errno = old_errno;
- }
+    int old_errno = errno;
+        
+    auto pid = Jobs::getInstance().getFgPid();
+    if (pid != 0)
+        kill(-pid, sig);
+    errno = old_errno;
+}
 
 
 /*
