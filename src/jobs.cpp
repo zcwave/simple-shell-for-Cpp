@@ -28,7 +28,6 @@ int maxjid(const std::vector<job_t> &jobs) {
     return max->jid;
 }
 
-/* addjob - Add a job to the job list */
 bool addjob(std::vector<job_t> &jobs, pid_t pid, JobState state, char *cmdline) 
 {
     int i;
@@ -54,7 +53,6 @@ bool addjob(std::vector<job_t> &jobs, pid_t pid, JobState state, char *cmdline)
     return 0;
 }
 
-/* deletejob - Delete a job whose PID=pid from the job list */
 int deletejob(struct job_t *jobs, pid_t pid) 
 {
     int i;
