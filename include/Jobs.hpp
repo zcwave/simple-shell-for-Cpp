@@ -23,7 +23,6 @@ private:
         //? 这是有必要的吗？
 
     }
-    ~Jobs();
 
     Jobs(const Jobs & src) = delete;
     Jobs(Jobs && src) = delete;
@@ -37,6 +36,8 @@ private:
     int max_jobs;
 
 public:
+    ~Jobs();
+
     static Jobs& getInstance() {
         static Jobs instance(MAXJOBS);
         return instance;
@@ -44,7 +45,7 @@ public:
 
 
     /* addjob - Add a job to the job list */
-    bool addJob(pid_t pid, JobState state, char* cmdline);
+    bool addJob(pid_t pid, JobState state, std::string cmdline);
 
 
     /* deletejob - Delete a job whose PID=pid from the job list */

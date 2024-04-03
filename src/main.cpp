@@ -1,6 +1,6 @@
 #include "tsh.h"
 #include "Signal.hpp"
-// #include "Jobs.h"
+#include "Jobs.hpp"
 // #include "userlib.h"
 /*
  * main - The shell's main routine 
@@ -22,6 +22,7 @@ bool verbose { true };           /* if true, print additional output */
 int main(int argc, char **argv) {
 
     bool emit_prompt = true; /* emit prompt (default) */
+    Jobs::getInstance();
 
     /* Redirect stderr to stdout (so that driver will get all output
      * on the pipe connected to stdout) */

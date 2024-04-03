@@ -2,6 +2,7 @@
 #include <iterator>
 #include <sstream>
 #include <cassert>
+#include "Jobs.hpp"
 
 using std::vector;
 using std::string;
@@ -45,6 +46,7 @@ void eval(const std::string &command) {
      
         if (auto pid = fork()) {
             wait(0);
+            Jobs::getInstance().addJob(pid, state, command);
             // BLOCK_NOT_SAVE_OLD_SET(mask_all);
             // addjob(jobs, pid, state, cmdline);
             // UNBLOCK(prev_one); // Unblock SIGCHLD.

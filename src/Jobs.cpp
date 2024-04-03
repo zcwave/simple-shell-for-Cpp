@@ -1,7 +1,7 @@
 #include "Jobs.hpp"
 #include <iostream>
 
-bool Jobs::addJob(pid_t pid, JobState state, char* cmdline) {
+bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
     int i;
     
     if (pid < 1)

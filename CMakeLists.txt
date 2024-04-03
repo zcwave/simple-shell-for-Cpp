@@ -31,6 +31,7 @@ add_library(tshlib SHARED
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp ${SRC_DIR}/tsh.cpp
     ${SRC_DIR}/signal_handlers.cpp 
+    ${SRC_DIR}/Jobs.cpp 
 )
 
 # 指定头文件目录
