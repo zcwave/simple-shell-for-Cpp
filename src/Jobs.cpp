@@ -1,5 +1,6 @@
 #include "Jobs.hpp"
 #include <iostream>
+#include <algorithm>
 
 bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
     
@@ -35,13 +36,23 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
 }
 
 std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
-    return false;
+
+    auto cond = [&pid](job_t j) {
+        return j.pid == pid;
+    };
+    
+    auto found = std::find_if(job_list.begin(), 
+                              job_list.end(), 
+                              cond);
+    if (found != job_list.end()) 
+        return *found;
+    return std::nullopt;
 }
     
 
 std::optional<job_t> Jobs::getJobByJid(int jid) {
 
-    return false;
+    return std::nullopt;
 }
 
 
