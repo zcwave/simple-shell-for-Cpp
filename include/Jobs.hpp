@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "tsh.h"
 #include "jobs_types.h"
+#include <optional>
 
 class Jobs {
 private:
@@ -54,15 +55,19 @@ public:
     pid_t getFgPid() const {
         return fgpid;
     }
-    job_t getJobByPid(pid_t pid);
-    job_t getJobByJid(int jid);
 
-    int pid2jid(pid_t pid) {
-        return 1;
-    }//! 这个函数应该是类内的吗？
 
+    /* getjobjid  - Find a job (by JID) on the job list */
+    std::optional<job_t> getJobByPid(pid_t pid);
+    
+
+    std::optional<job_t> getJobByJid(int jid);
+
+
+    /* pid2jid - Map process ID to job ID */
+    int pid2jid(pid_t pid);     
+    
+    
     /* listjobs - Print the job list */
     void list();
-
-
 };

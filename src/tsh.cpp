@@ -54,7 +54,7 @@ void eval(const std::string &command) {
             // else {
             //     // the job is bg.
             //     // BLOCK_NOT_SAVE_OLD_SET(mask_all);
-            //     int jid = Jobs::getInstance().pid2jid(pid);
+            //     int jid = Jobs::getInstance().pid2jid(pid); //! 要检测映射是否返回一个值
             //     printf("[%d] (%d) %s", jid, pid, command.c_str());
             // }  
             // // UNBLOCK(prev_one);//Unblock all signal

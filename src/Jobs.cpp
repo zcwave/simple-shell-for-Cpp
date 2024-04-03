@@ -2,7 +2,6 @@
 #include <iostream>
 
 bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
-    int i;
     
     if (pid < 1)
 		return false;
@@ -35,11 +34,28 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
     return false;
 }
 
+std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
+    return false;
+}
+    
+
+std::optional<job_t> Jobs::getJobByJid(int jid) {
+
+    return false;
+}
+
+
+int Jobs::pid2jid(pid_t pid) {
+
+    //! 这个函数应该是类内的吗？
+    return 1;
+}
 
 
 
 
 void Jobs::list() {
+
     for (auto x : job_list) {
         if (x.pid != 0) {
             printf("[%d] (%d) ", x.jid, x.pid);

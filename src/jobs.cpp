@@ -92,7 +92,6 @@ struct job_t *getjobpid(struct job_t *jobs, pid_t pid) {
     return NULL;
 }
 
-/* getjobjid  - Find a job (by JID) on the job list */
 struct job_t *getjobjid(struct job_t *jobs, int jid) 
 {
     int i;
@@ -105,7 +104,6 @@ struct job_t *getjobjid(struct job_t *jobs, int jid)
     return NULL;
 }
 
-/* pid2jid - Map process ID to job ID */
 int pid2jid(pid_t pid) 
 {
     int i;
@@ -119,32 +117,7 @@ int pid2jid(pid_t pid)
     return 0;
 }
 
-/* listjobs - Print the job list */
-void listjobs(struct job_t *jobs) 
-{
-    int i;
-    
-    for (i = 0; i < MAXJOBS; i++) {
-	if (jobs[i].pid != 0) {
-	    printf("[%d] (%d) ", jobs[i].jid, jobs[i].pid);
-	    switch (jobs[i].state) {
-		case BG: 
-		    printf("Running ");
-		    break;
-		case FG: 
-		    printf("Foreground ");
-		    break;
-		case ST: 
-		    printf("Stopped ");
-		    break;
-	    default:
-		    printf("listjobs: Internal error: job[%d].state=%d ", 
-			   i, jobs[i].state);
-	    }
-	    printf("%s", jobs[i].cmdline);
-	}
-    }
-}
+
 /******************************
  * end job list helper routines
  ******************************/
