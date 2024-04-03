@@ -9,6 +9,7 @@
 // #define ST 3    /* stopped */
 #include <string>
 #include <sys/types.h>
+
 enum JobState {    /* 
     * Jobs states: FG (foreground), BG (background), ST (stopped)
     * Job state transitions and enabling actions:

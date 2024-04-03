@@ -21,7 +21,7 @@
 #include <vector>
 #include <iostream>
 
-#include "jobs.h"
+#include "jobs_types.h"
 
 
 /* Misc manifest constants */

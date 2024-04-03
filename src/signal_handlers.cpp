@@ -1,5 +1,5 @@
 #include "tsh.h"
-#include "jobs.h"
+#include "jobs_types.h"
 #include "Signal.hpp"
 
 using std::cout, std::endl;
@@ -14,18 +14,16 @@ using std::cout, std::endl;
  *     available zombie children, but doesn't wait for any other
  *     currently running children to terminate.  
  */
-// void sigchld_handler(int sig) 
-//  {
-//    int old_errno = errno;
-//    pid_t pid;
-//    int status;
-//    sigset_t mask_all, prev_all; 
+// void sigchld_handler(int sig) {
+//     int old_errno = errno;
+//     pid_t pid;
+//     int status;
+//   //  sigset_t mask_all, prev_all; 
      
-//    sigfillset(&mask_all);  
+//   //  sigfillset(&mask_all);  
  
-//    while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
-//    {
-//      BLOCK(mask_all, prev_all);
+//     while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+//         // BLOCK(mask_all, prev_all);
 //      struct job_t *job = getjobpid(jobs, pid);
  
 //      if (pid == fgpid(jobs)){
@@ -54,8 +52,8 @@ using std::cout, std::endl;
 //      UNBLOCK(prev_all);
 //    }
  
-//    errno = old_errno;
-//  }
+//     errno = old_errno;
+// }
 /* 
  * sigint_handler - The kernel sends a SIGINT to the shell whenver the
  *    user types ctrl-c at the keyboard.  Catch it and send it along

@@ -1,5 +1,6 @@
 #include "tsh.h"
 #include "Signal.hpp"
+// #include "Jobs.h"
 // #include "userlib.h"
 /*
  * main - The shell's main routine 
@@ -12,8 +13,8 @@ extern char **environ;      /* defined in libc */
 // int nextjid = 1;            /* next job ID to allocate */
 // char sbuf[MAXLINE];         /* for composing sprintf messages */
 // std::vector<job_t> jobs(MAXJOBS); 
-const std::string prompt = "tsh> ";    /* command line prompt (DO NOT CHANGE) */
-bool verbose = false;           /* if true, print additional output */
+const std::string prompt {"tsh> "};    /* command line prompt (DO NOT CHANGE) */
+bool verbose { false };           /* if true, print additional output */
 // volatile sig_atomic_t FG_PID_GLOBALS;
 
 /* End global variables */

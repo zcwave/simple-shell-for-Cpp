@@ -1,5 +1,5 @@
 #include "tsh.h"
-#include "jobs.h"
+#include "jobs_types.h"
 #include <algorithm>
 /***********************************************
  * Helper routines that manipulate the job list
