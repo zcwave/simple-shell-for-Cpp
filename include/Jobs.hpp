@@ -16,13 +16,12 @@ private:
         if (job_max_num < 0) {
             throw std::logic_error("job_max_num must be a vaild number.");
         }
-        job_list.reserve(job_max_num);
-        for (auto &x : job_list) {
-            x  = job_t();
+        for (int i = 0; i < job_max_num; i++) {
+            job_list.push_back(job_t());
         }
-        //? 这是有必要的吗？
-
     }
+
+    ~Jobs(){}
 
     Jobs(const Jobs & src) = delete;
     Jobs(Jobs && src) = delete;
@@ -36,7 +35,6 @@ private:
     int max_jobs;
 
 public:
-    ~Jobs();
 
     static Jobs& getInstance() {
         static Jobs instance(MAXJOBS);
