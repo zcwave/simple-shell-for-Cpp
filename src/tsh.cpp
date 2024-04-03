@@ -33,11 +33,12 @@ void eval(const std::string &command_line) {
     //  sigset_t mask_all;
     //  sigset_t mask_one, prev_one;
  
-    //  Sigfillset(&mask_all);
-    //  Sigemptyset(&mask_one);
-    //  Sigaddset(&mask_one, SIGCHLD);
+    //  sigfillset(&mask_all);
+
+    //  sigemptyset(&mask_one);
+    //  sigaddset(&mask_one, SIGCHLD);
      
-    //  BLOCK(mask_one, prev_one); // Block SIGCHLD.
+     // BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
             // auto state = bg ? BG : FG;
@@ -82,77 +83,25 @@ void eval(const std::string &command_line) {
 
 JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
 
-
+    JobState state = FG;
     std::istringstream iss(cmdline);
     std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                     std::istream_iterator<std::string>{}};
-    tokens.push_back(string{}); // 表示ARGV中的 NULL 结尾
+    // tokens.push_back(string{}); // 表示ARGV中的 NULL 结尾
     for (auto &x : tokens) {
         argv.push_back(x.c_str());
     }
-    // //? DEBUG
-    // for (auto x : tokens) {
-    //     std::cout << x << std::endl;
-    // }
-    // for (auto x : argv) {
-    //     std::cout << x << std::endl;
-    // }
 
-//     /* should the job run in the background? */
-//     if ((bg = (*argv[argc-1] == '&')) != 0) {
-//         argv[--argc] = NULL;
-//     }
-//     return BG;
-    return BG;
+    //? DEBUG: std::cout << *argv.rbegin() << std::endl;
+    /* should the job run in the background? */
+    if (*argv.rbegin() == string("&")) {
+        argv.pop_back();
+        state = BG;
+    }
+    argv.push_back(nullptr); // add NULL as argv END.
+    return state;
 }
-// JobState parseline(string &cmdline, std::vector<const char *> &argv) {
-//     static char array[MAXLINE]; /* holds local copy of command line */
-//     char *buf = array;          /* ptr that traverses command line */
-//     char *delim;                /* points to first space delimiter */
-//     int argc;                   /* number of args */
-//     int bg;                     /* background job? */
 
-//     strcpy(buf, cmdline);
-//     buf[strlen(buf)-1] = ' ';  /* replace trailing '\n' with space */
-//     while (*buf && (*buf == ' ')) /* ignore leading spaces */
-// 	buf++;
-
-//     /* Build the argv list */
-//     argc = 0;
-//     if (*buf == '\'') {
-//         buf++;
-//         delim = strchr(buf, '\'');
-//     }
-//     else {
-//         delim = strchr(buf, ' ');
-//     }
-
-//     while (delim) {
-// 	argv[argc++] = buf;
-// 	*delim = '\0';
-// 	buf = delim + 1;
-// 	while (*buf && (*buf == ' ')) /* ignore spaces */
-// 	       buf++;
-
-// 	if (*buf == '\'') {
-// 	    buf++;
-// 	    delim = strchr(buf, '\'');
-// 	} else {
-// 	    delim = strchr(buf, ' ');
-// 	}
-//     }
-//     argv[argc] = NULL;
-    
-//     if (argc == 0)  /* ignore blank line */
-//         return UNDEF; //!!!!!! 占位符，更改
-        
-
-//     /* should the job run in the background? */
-//     if ((bg = (*argv[argc-1] == '&')) != 0) {
-//         argv[--argc] = NULL;
-//     }
-//     return BG;
-// }
 
 /* 
  * builtin_cmd - If the user has typed a built-in command then execute

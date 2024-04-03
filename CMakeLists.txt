@@ -17,6 +17,12 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 
+# 默认采用Release模式
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+
 add_library(tshlib SHARED
     ${LIB_DIR}/tshlib.cpp ${LIB_DIR}/tshlib.h
 )

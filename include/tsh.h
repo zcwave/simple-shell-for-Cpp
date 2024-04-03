@@ -37,11 +37,11 @@ constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */
 
 
 // #define BLOCK(set, old_set) / 
-//         Sigprocmask(SIG_BLOCK, &(set), &(old_set))
+//         sigprocmask(SIG_BLOCK, &(set), &(old_set))
 // #define BLOCK_NOT_SAVE_OLD_SET(set) /
-//         Sigprocmask(SIG_BLOCK, &(set), NULL)
+//         sigprocmask(SIG_BLOCK, &(set), NULL)
 // #define UNBLOCK(old_set) /
-//         Sigprocmask(SIG_SETMASK, &(old_set), NULL)
+//         sigprocmask(SIG_SETMASK, &(old_set), NULL)
 
 
 
