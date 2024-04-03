@@ -33,6 +33,7 @@ constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */
 
 
 extern bool verbose; 
+extern volatile sig_atomic_t FG_PID_GLOBALS;
 
 
 // #define BLOCK(set, old_set) / 
@@ -52,7 +53,7 @@ void eval(const std::string &command_line);
 bool isbuiltinCommand(const std::vector<const char *> argv);
 JobState parseline(const std::string &cmdline, std::vector<const char *> &argv); 
 // void do_bgfg(char **argv);
-// void waitfg(pid_t pid);
+void waitfg(pid_t pid);
 
 // void sigchld_handler(int sig);
 // void sigtstp_handler(int sig);
@@ -62,16 +63,7 @@ JobState parseline(const std::string &cmdline, std::vector<const char *> &argv);
 // int parseline(const char *cmdline, char **argv); 
 // void sigquit_handler(int sig);
 
-// void clearjob(struct job_t *job);
-// void initjobs(struct job_t *jobs);
-// int maxjid(struct job_t *jobs); 
-// int addjob(struct job_t *jobs, pid_t pid, int state, char *cmdline);
-// int deletejob(struct job_t *jobs, pid_t pid); 
-// pid_t fgpid(struct job_t *jobs);
-// struct job_t *getjobpid(struct job_t *jobs, pid_t pid);
-// struct job_t *getjobjid(struct job_t *jobs, int jid); 
-// int pid2jid(pid_t pid); 
-// void listjobs(struct job_t *jobs);
+
 
 void usage(void);
 // void unix_error(char *msg);

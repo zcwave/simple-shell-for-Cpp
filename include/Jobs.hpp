@@ -57,7 +57,9 @@ public:
     job_t getJobByPid(pid_t pid);
     job_t getJobByJid(int jid);
 
-    int pid2jid(pid_t pid); //! 这个函数应该是类内的吗？
+    int pid2jid(pid_t pid) {
+        return 1;
+    }//! 这个函数应该是类内的吗？
 
     /* listjobs - Print the job list */
     void list();

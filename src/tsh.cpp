@@ -40,9 +40,9 @@ void eval(const std::string &command) {
      // BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
-            wait(0);
             Jobs::getInstance().addJob(pid, state, command);
             
+            wait(0);
             // BLOCK_NOT_SAVE_OLD_SET(mask_all);
             // addjob(jobs, pid, state, cmdline);
             // UNBLOCK(prev_one); // Unblock SIGCHLD.
@@ -53,10 +53,11 @@ void eval(const std::string &command) {
             // }
             // else {
             //     // the job is bg.
-            //     BLOCK_NOT_SAVE_OLD_SET(mask_all);
-            //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+            //     // BLOCK_NOT_SAVE_OLD_SET(mask_all);
+            //     int jid = Jobs::getInstance().pid2jid(pid);
+            //     printf("[%d] (%d) %s", jid, pid, command.c_str());
             // }  
-            // UNBLOCK(prev_one);//Unblock all signal
+            // // UNBLOCK(prev_one);//Unblock all signal
         }
         else {
         // child runs user job.
@@ -92,7 +93,7 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
     for (auto &x : tokens) {
         argv.push_back(std::move(x.c_str()));
     }
-    //！ 待测试 move！ 与 auto &
+    //! 待测试 move！ 与 auto &
 
     //? DEBUG: std::cout << *argv.rbegin() << std::endl;
     /* should the job run in the background? */
@@ -125,7 +126,7 @@ bool isbuiltinCommand(const std::vector<const char *> argv) {
 //      Sigfillset(&mask_all);
  
 //      BLOCK(mask_all, prev_all);
-//      listjobs(jobs);
+        Jobs::getInstance().list();
 //      UNBLOCK(prev_all);
         return true;
     }
@@ -193,15 +194,14 @@ bool isbuiltinCommand(const std::vector<const char *> argv) {
 /* 
  * waitfg - Block until process pid is no longer the foreground process
  */
-// void waitfg(pid_t pid)
-//  {
-//    sigset_t mask;
-//    sigemptyset(&mask);
+void waitfg(pid_t pid) {
+   sigset_t mask;
+   sigemptyset(&mask);
  
-//    FG_PID_GLOBALS = 0;
-//    while (!FG_PID_GLOBALS)
-//      sigsuspend(&mask);
-//  }
+   FG_PID_GLOBALS = 0;
+   while (!FG_PID_GLOBALS)
+        sigsuspend(&mask);
+}
 
 
 

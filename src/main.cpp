@@ -15,7 +15,7 @@ extern char **environ;      /* defined in libc */
 // std::vector<job_t> jobs(MAXJOBS); 
 const std::string prompt {"tsh> "};    /* command line prompt (DO NOT CHANGE) */
 bool verbose { false };           /* if true, print additional output */
-// volatile sig_atomic_t FG_PID_GLOBALS;
+volatile sig_atomic_t FG_PID_GLOBALS;
 
 /* End global variables */
 
