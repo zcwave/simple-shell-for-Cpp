@@ -1,6 +1,7 @@
 #include "tsh.h"
 #include <iterator>
 #include <sstream>
+#include <cassert>
 
 using std::vector;
 using std::string;
@@ -15,17 +16,19 @@ using std::string;
  * background children don't receive SIGINT (SIGTSTP) from the kernel
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
-void eval(const std::string &command_line) { 
+void eval(const std::string &command) { 
     std::vector<const char *> argv{}; // argument list exec()
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
-    auto state { parseline(command_line ,argv) }; // should the job run in bg or fg?
+    auto state { parseline(command ,argv) }; // should the job run in bg or fg?
  
     //? DEBUG
     // for (auto x : argv) {
     //     std::cout << x << std::endl;
     // }
-    if (argv[0] == string{})
+    if (argv[0] == string{}) {
+        assert(argv.size() == 1);
         return; // Ignore empty lines.
+    }
  
  
     if (!isbuiltinCommand(argv)) {
@@ -41,7 +44,7 @@ void eval(const std::string &command_line) {
      // BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
-            // auto state = bg ? BG : FG;
+            wait(0);
             // BLOCK_NOT_SAVE_OLD_SET(mask_all);
             // addjob(jobs, pid, state, cmdline);
             // UNBLOCK(prev_one); // Unblock SIGCHLD.
@@ -87,10 +90,11 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
     std::istringstream iss(cmdline);
     std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                     std::istream_iterator<std::string>{}};
-    // tokens.push_back(string{}); // 表示ARGV中的 NULL 结尾
+
     for (auto &x : tokens) {
-        argv.push_back(x.c_str());
+        argv.push_back(std::move(x.c_str()));
     }
+    //！ 待测试 move！ 与 auto &
 
     //? DEBUG: std::cout << *argv.rbegin() << std::endl;
     /* should the job run in the background? */
