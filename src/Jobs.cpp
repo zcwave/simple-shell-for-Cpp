@@ -14,6 +14,7 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
             if (next_jid > MAXJOBS)
                 next_jid = 1;
             if (verbose) {
+
                 printf("Added job [%d] %d %s\n", 
                                     x.jid, 
                                     x.pid, 

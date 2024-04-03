@@ -18,19 +18,14 @@ using std::string;
  * when we type ctrl-c (ctrl-z) at the keyboard.  
 */
 void eval(const std::string &command) { 
+
+    if (command.size() == 0) {
+        return; // Ignore empty lines.
+    }
+
     std::vector<const char *> argv{}; // argument list exec()
    // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
     auto state { parseline(command ,argv) }; // should the job run in bg or fg?
- 
-    //? DEBUG
-    // for (auto x : argv) {
-    //     std::cout << x << std::endl;
-    // }
-    if (argv[0] == string{}) {
-        assert(argv.size() == 1);
-        return; // Ignore empty lines.
-    }
- 
  
     if (!isbuiltinCommand(argv)) {
  
@@ -47,16 +42,17 @@ void eval(const std::string &command) {
         if (auto pid = fork()) {
             wait(0);
             Jobs::getInstance().addJob(pid, state, command);
+            
             // BLOCK_NOT_SAVE_OLD_SET(mask_all);
             // addjob(jobs, pid, state, cmdline);
             // UNBLOCK(prev_one); // Unblock SIGCHLD.
         
-            // /* Parent waits for fg job to terminate.*/
-            // if (!bg){
+            /* Parent waits for fg job to terminate.*/
+            // if (state == FG){
             //     waitfg(pid);
             // }
             // else {
-                // the job is bg.
+            //     // the job is bg.
             //     BLOCK_NOT_SAVE_OLD_SET(mask_all);
             //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
             // }  
@@ -101,8 +97,12 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
     //? DEBUG: std::cout << *argv.rbegin() << std::endl;
     /* should the job run in the background? */
     if (*argv.rbegin() == string("&")) {
-        argv.pop_back();
-        state = BG;
+        if (argv.size() > 2) {
+            argv.pop_back();
+            state = BG;
+        } else {
+            return state; // single "&"
+        }
     }
     argv.push_back(nullptr); // add NULL as argv END.
     return state;
@@ -190,9 +190,9 @@ bool isbuiltinCommand(const std::vector<const char *> argv) {
 //    }
 //  }
 
-// /* 
-//  * waitfg - Block until process pid is no longer the foreground process
-//  */
+/* 
+ * waitfg - Block until process pid is no longer the foreground process
+ */
 // void waitfg(pid_t pid)
 //  {
 //    sigset_t mask;
