@@ -14,7 +14,7 @@ extern char **environ;      /* defined in libc */
 // char sbuf[MAXLINE];         /* for composing sprintf messages */
 // std::vector<job_t> jobs(MAXJOBS); 
 const std::string prompt {"tsh> "};    /* command line prompt (DO NOT CHANGE) */
-bool verbose { false };           /* if true, print additional output */
+bool verbose { true };           /* if true, print additional output */
 // volatile sig_atomic_t FG_PID_GLOBALS;
 
 /* End global variables */

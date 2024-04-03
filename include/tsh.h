@@ -32,8 +32,7 @@ constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */
 
 
 
-
-
+extern bool verbose; 
 
 
 // #define BLOCK(set, old_set) / 
