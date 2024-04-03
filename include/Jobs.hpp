@@ -12,14 +12,16 @@ private:
                             job_list({}), 
                             fgpid(0), 
                             next_jid(1), 
-                            max_jobs(job_max_num) 
-    {
+                            max_jobs(job_max_num) {
+                                
         if (job_max_num < 0) {
             throw std::logic_error("job_max_num must be a vaild number.");
         }
-        for (int i = 0; i < job_max_num; i++) {
-            job_list.push_back(job_t());
-        }
+
+
+        // init job_list.
+        job_list.resize(job_max_num);
+        //! The reverse method has no effect here.
     }
 
     ~Jobs(){}
