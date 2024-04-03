@@ -1,22 +1,5 @@
 # Simple Unix shell for cpp
-
-# Project Struct
-
-.
-├── build
-├── CMakeLists.txt   
-├── include
-│  ├── jobs_types.h
-│  └── tsh.hpp
-├── lib
-│  ├── CMakeLists.txt
-│  ├── utilities.cpp
-│  └── utilities.h
-└── src
-   └── main.cpp
  
-
-
 # Build
 
 ```bash
