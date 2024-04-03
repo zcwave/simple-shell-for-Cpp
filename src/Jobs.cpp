@@ -59,7 +59,7 @@ void Jobs::list() {
                             x.state);
             }
 
-            printf("%s", x.cmdline.c_str());
+            printf("%s\n", x.cmdline.c_str());
 
 	    }
     }
