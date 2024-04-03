@@ -1,15 +1,9 @@
-#ifndef __JOBS__H__
-#define __JOBS__H__
+#pragma once
 
-
-// /* Job states */
-// #define UNDEF 0 /* undefined */
-// #define FG 1    /* running in foreground */
-// #define BG 2    /* running in background */
-// #define ST 3    /* stopped */
 #include <string>
 #include <sys/types.h>
 
+/* Job states */
 enum JobState {    /* 
     * Jobs states: FG (foreground), BG (background), ST (stopped)
     * Job state transitions and enabling actions:
@@ -39,5 +33,3 @@ struct job_t {              /* The job struct */
     std::string cmdline{};
 };
 
-
-#endif // __JOBS__H__

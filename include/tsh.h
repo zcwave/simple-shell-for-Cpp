@@ -1,74 +1,34 @@
-#ifndef __TSH__H__
-#define __TSH__H__   
+#pragma once  
 
 /* 
  * tsh - A tiny shell program with job control
  */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
-
-#include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
-
-#include <string>
-#include <string_view>
-#include <vector>
-#include <iostream>
-
 #include "jobs_types.h"
-
-
-/* Misc manifest constants */
-constexpr int MAXLINE = 1024;     /* max line size */
-constexpr int MAXARGS = 128;      /* max args on a command line */
-constexpr int MAXJOBS = 16;       /* max jobs at any point in time */
-constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */ 
-
+#include <vector>
 
 
 extern bool verbose; 
-extern volatile sig_atomic_t FG_PID_GLOBALS;
 
 
-// #define BLOCK(set, old_set) / 
-//         sigprocmask(SIG_BLOCK, &(set), &(old_set))
-// #define BLOCK_NOT_SAVE_OLD_SET(set) /
-//         sigprocmask(SIG_BLOCK, &(set), NULL)
-// #define UNBLOCK(old_set) /
-//         sigprocmask(SIG_SETMASK, &(old_set), NULL)
-
-
-
-
-// /* Function prototypes */
-
-// /* Here are the functions that you will implement */
 void eval(const std::string &command_line);  
+
+
+/* 
+ * builtin_cmd - If the user has typed a built-in command then execute
+ *    it immediately.  
+ */
 bool isbuiltinCommand(const std::vector<const char *> argv);
+
+
+/* 
+ * parseline - Parse the command line and build the argv array.
+ * 
+ * Characters enclosed in single quotes are treated as a single
+ * argument.  Return true if the user has requested a BG job, false if
+ * the user has requested a FG job.  
+ */
 JobState parseline(const std::string &cmdline, std::vector<const char *> &argv); 
-// void do_bgfg(char **argv);
-void waitfg(pid_t pid);
 
-// void sigchld_handler(int sig);
-// void sigtstp_handler(int sig);
-// void sigint_handler(int sig);
-
-// /* Here are helper routines that we've provided for you */
-// int parseline(const char *cmdline, char **argv); 
-// void sigquit_handler(int sig);
-
-
-
+// in "lib/tshlib.h"
 void usage(void);
-// void unix_error(char *msg);
-void app_error(const std::string_view msg);
-// typedef void handler_t(int);
-// handler_t *Signal(int signum, handler_t *handler);
-
-#endif // __TSH__H__
