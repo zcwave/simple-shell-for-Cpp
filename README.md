@@ -3,8 +3,8 @@
 # Build
 
 ```bash
-# Current dictory is simple-shell-for-cpp/
 cd simple-shell-for-cpp
+# Current dictory is simple-shell-for-cpp/
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel 4
 ```
