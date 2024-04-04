@@ -48,21 +48,16 @@ int main(int argc, char **argv) {
     // /* Install the signal handlers */
 
     // /* These are the ones you will need to implement */
-    // Signal(SIGINT,  sigint_handler);   /* ctrl-c */
-    // Signal(SIGTSTP, sigtstp_handler);  /* ctrl-z */
-    // Signal(SIGCHLD, sigchld_handler);  /* Terminated or stopped child */
+    Signal(SIGINT,  sigint_handler);   /* ctrl-c */
+    Signal(SIGTSTP, sigtstp_handler);  /* ctrl-z */
+    Signal(SIGCHLD, sigchld_handler);  /* Terminated or stopped child */
 
     // /* This one provides a clean way to kill the shell */
     Signal(SIGQUIT, sigquit_handler); 
 
-    // /* Initialize the job list */
-    // initjobs(jobs);
-
     
     std::string command{};
-    using std::cin;
-    using std::flush;
-    using std::cout;
+    using std::cin, std::flush, std::cout;
     /* Execute the shell's read/eval loop */
     while (true) {
         /* Read command line */

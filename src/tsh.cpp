@@ -6,6 +6,7 @@
 
 using std::vector;
 using std::string;
+
 /* 
  * eval - Evaluate the command line that the user has just typed in
  * 
@@ -31,15 +32,16 @@ void eval(const std::string &command) {
  
     if (!isbuiltinCommand(argv)) {
  
-    //  sigset_t mask_all;
-    //  sigset_t mask_one, prev_one;
- 
-    //  sigfillset(&mask_all);
+        // sigset_t mask_all;
+        // sigset_t mask_one, prev_one;
+    
+        // sigfillset(&mask_all);
 
-    //  sigemptyset(&mask_one);
-    //  sigaddset(&mask_one, SIGCHLD);
-     
-     // BLOCK(mask_one, prev_one); // Block SIGCHLD.
+        // sigemptyset(&mask_one);
+        // sigaddset(&mask_one, SIGCHLD);
+        
+        // sigprocmask(SIG_BLOCK, &(mask_one), &(prev_one));
+    //! BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
 
@@ -127,7 +129,7 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-bool isbuiltinCommand(const std::vector<const char *> argv) {
+bool isbuiltinCommand(std::vector<const char *> &argv) {
 
     string cmd_name = argv[0];
     if (cmd_name == "quit") // quit command.
@@ -144,65 +146,70 @@ bool isbuiltinCommand(const std::vector<const char *> argv) {
         return true;
     }
     else if (cmd_name == "bg" || cmd_name == "fg") { // bg or fg commands.
-        // do_bgfg(argv);
+        do_bgfg(argv);
         return true;
     }
     return false;               /* not a builtin command */
 }
 
-// /* 
-//  * do_bgfg - Execute the builtin bg and fg commands
-//  */
-// void do_bgfg(char **argv) 
-//  {
-//    struct job_t *job;
-//    int id;
+/* 
+ * do_bgfg - Execute the builtin bg and fg commands
+ */
+void do_bgfg(std::vector<const char *> &argv) {
+    int id;
+    std::optional<job_t> job;
 //    sigset_t mask_all, prev_all;
 //    Sigfillset(&mask_all);
  
-//    if (argv[1] == NULL){
-//      // single fg or bg.
-//      printf("%s command requires PID or %%jobid argument\n", argv[0]);
-//      return;
-//    }
-//    else if (sscanf(argv[1], "%%%d", &id) > 0){
-//      BLOCK(mask_all, prev_all);
-//      job = getjobjid(jobs, id);
-//      UNBLOCK(prev_all);
+    if (argv[1] == nullptr){
+        assert(argv.size() == 2);
+        // single fg or bg.
+        printf("%s command requires PID or %%jobid argument\n", argv[0]);
+        return;
+    } else if (sscanf(argv[1], "%%%d", &id) > 0){
+    //! BLOCK(mask_all, prev_all);
+        job = Jobs::getInstance().getJobByJid(id);
+    //! UNBLOCK(prev_all);
+
+        if (!job.has_value()) {
+            // not found the job.
+            printf("%%%d: No such job\n", id);
+            return;
+        }
+
+    } else if(sscanf(argv[1], "%d", &id) > 0){
+    //! BLOCK(mask_all, prev_all);
+        job = Jobs::getInstance().getJobByPid(id);
+    //! UNBLOCK(prev_all); 
+        if (!job.has_value()) {
  
-//      if (job == NULL){
-//        // not found the job.
-//        printf("%%%d: No such job\n", id);
-//        return;
-//      }
-//    }
-//    else if(sscanf(argv[1], "%d", &id) > 0){
-//      BLOCK(mask_all, prev_all);
-//      job = getjobpid(jobs, id);
-//      UNBLOCK(prev_all); 
+            printf("(%d): No such process\n", id);
+            return;
+        }
+
+   } else {
+        // not pid or jid.
+        printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+        return;
+   }
  
-//      if (job == NULL){
-//        printf("(%d): No such process\n", id);
-//        return;
-//      }
-//    }
-//    else{
-//      // not pid or jid.
-//      printf("%s: argument must be a PID or %%jobid\n", argv[0]);
-//      return;
-//    }
- 
-//    if (!strcmp(argv[0], "bg")){
-//      kill(-(job->pid), SIGCONT);
-//      job->state = BG;
-//      printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-//    }
-//    else if (!strcmp(argv[0], "fg")){
-//      kill(-(job->pid), SIGCONT);
-//      job->state = FG;
-//      waitfg(job->pid);
-//    }
-//  }
+    if (argv[0] == string("bg")) {
+
+        kill(-(job.value().pid), SIGCONT);
+        job.value().state = BG;
+        printf("[%d] (%d) %s", 
+                        job.value().jid, 
+                        job.value().pid, 
+                        job.value().cmdline.c_str());
+
+    } else if (argv[0] == string("fg")) {
+
+        kill(-(job->pid), SIGCONT);
+        job.value().state = FG;
+        waitfg(job.value().pid);
+
+    }
+}
 
 /* 
  * waitfg - Block until process pid is no longer the foreground process

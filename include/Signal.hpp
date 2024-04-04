@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 
+
 /*
  * Signal - wrapper for the sigaction function
  */
@@ -19,6 +20,7 @@ decltype(auto) Signal(int signum, auto handler_fn)
 	    throw std::runtime_error("Signal install error");
     return (old_action.sa_handler);
 }
+
 
 
 void sigquit_handler(int sig);

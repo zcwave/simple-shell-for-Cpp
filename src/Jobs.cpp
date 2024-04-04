@@ -27,6 +27,7 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
                                     x.pid, 
                                     x.cmdline.c_str());
             }
+
             return true;
        }
     }

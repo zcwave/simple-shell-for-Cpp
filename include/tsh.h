@@ -50,25 +50,17 @@ extern volatile sig_atomic_t FG_PID_GLOBALS;
 
 // /* Here are the functions that you will implement */
 void eval(const std::string &command_line);  
-bool isbuiltinCommand(const std::vector<const char *> argv);
+bool isbuiltinCommand(std::vector<const char *> &argv);
 JobState parseline(const std::string &cmdline, std::vector<const char *> &argv); 
-// void do_bgfg(char **argv);
+/* 
+ * do_bgfg - Execute the builtin bg and fg commands
+ */
+void do_bgfg(std::vector<const char *> &argv);
 void waitfg(pid_t pid);
-
-// void sigchld_handler(int sig);
-// void sigtstp_handler(int sig);
-// void sigint_handler(int sig);
-
-// /* Here are helper routines that we've provided for you */
-// int parseline(const char *cmdline, char **argv); 
-// void sigquit_handler(int sig);
-
 
 
 void usage(void);
 // void unix_error(char *msg);
 void app_error(const std::string_view msg);
-// typedef void handler_t(int);
-// handler_t *Signal(int signum, handler_t *handler);
 
 #endif // __TSH__H__
