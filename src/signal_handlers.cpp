@@ -1,3 +1,6 @@
+#include <iostream>
+#include <sys/wait.h>
+
 #include "tsh.h"
 #include "jobs_types.h"
 #include "Signal.hpp"

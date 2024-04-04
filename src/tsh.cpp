@@ -1,11 +1,12 @@
-#include "tsh.h"
 #include <iterator>
 #include <sstream>
+#include <iostream>
 #include <cassert>
-#include "Jobs.hpp"
 
-using std::vector;
-using std::string;
+#include "Jobs.hpp"
+#include "tsh.h"
+
+using std::vector, std::string;
 
 #define BLOCK(set, old_set) sigprocmask(SIG_BLOCK, &(set), &(old_set))
 #define BLOCK_NOT_SAVE_OLD_SET(set) sigprocmask(SIG_BLOCK, &(set), NULL)

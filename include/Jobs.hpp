@@ -2,9 +2,10 @@
 
 #include <vector>
 #include <stdexcept>
+#include <optional>
+
 #include "tsh.h"
 #include "jobs_types.h"
-#include <optional>
 
 class Jobs {
 private:
