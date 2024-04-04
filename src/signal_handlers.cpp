@@ -5,6 +5,9 @@
 
 using std::cout, std::endl;
 
+#define BLOCK(set, old_set) sigprocmask(SIG_BLOCK, &(set), &(old_set))
+#define BLOCK_NOT_SAVE_OLD_SET(set) sigprocmask(SIG_BLOCK, &(set), NULL)
+#define UNBLOCK(old_set) sigprocmask(SIG_SETMASK, &(old_set), NULL)
 
 /* 
  * sigchld_handler - The kernel sends a SIGCHLD to the shell whenever
@@ -17,14 +20,14 @@ void sigchld_handler(int sig) {
     int old_errno = errno;
     pid_t pid;
     int status;
-  //  sigset_t mask_all, prev_all; 
-     
-  //  sigfillset(&mask_all);  
+    sigset_t mask_all, prev_all; 
+        
+    sigfillset(&mask_all);  
  
     while((pid = waitpid(-1, 
                          &status, 
                          WNOHANG | WUNTRACED)) > 0) {
-        // BLOCK(mask_all, prev_all);
+        BLOCK(mask_all, prev_all);
         auto job = Jobs::getInstance().getJobByPid(pid);
 
         if (!job.has_value()) {
@@ -63,7 +66,7 @@ void sigchld_handler(int sig) {
                 cout << "BUG!! sigchld_handler" << endl;
         }
  
-        //! UNBLOCK(prev_all);
+        UNBLOCK(prev_all);
    }
  
     errno = old_errno;

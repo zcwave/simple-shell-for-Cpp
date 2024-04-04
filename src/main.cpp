@@ -1,24 +1,18 @@
 #include "tsh.h"
 #include "Signal.hpp"
 #include "Jobs.hpp"
-// #include "userlib.h"
-/*
- * main - The shell's main routine 
- */
-
 
 
 // /* Global variables */
 extern char **environ;      /* defined in libc */
-// int nextjid = 1;            /* next job ID to allocate */
-// char sbuf[MAXLINE];         /* for composing sprintf messages */
-// std::vector<job_t> jobs(MAXJOBS); 
 const std::string prompt {"tsh> "};    /* command line prompt (DO NOT CHANGE) */
 bool verbose { false };           /* if true, print additional output */
 volatile sig_atomic_t FG_PID_GLOBALS;
-
 /* End global variables */
 
+/*
+ * main - The shell's main routine 
+ */
 int main(int argc, char **argv) {
 
     bool emit_prompt = true; /* emit prompt (default) */
@@ -46,13 +40,9 @@ int main(int argc, char **argv) {
     }
 
     // /* Install the signal handlers */
-
-    // /* These are the ones you will need to implement */
     Signal(SIGINT,  sigint_handler);   /* ctrl-c */
     Signal(SIGTSTP, sigtstp_handler);  /* ctrl-z */
     Signal(SIGCHLD, sigchld_handler);  /* Terminated or stopped child */
-
-    // /* This one provides a clean way to kill the shell */
     Signal(SIGQUIT, sigquit_handler); 
 
     

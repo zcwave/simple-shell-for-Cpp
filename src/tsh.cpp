@@ -7,6 +7,10 @@
 using std::vector;
 using std::string;
 
+#define BLOCK(set, old_set) sigprocmask(SIG_BLOCK, &(set), &(old_set))
+#define BLOCK_NOT_SAVE_OLD_SET(set) sigprocmask(SIG_BLOCK, &(set), NULL)
+#define UNBLOCK(old_set) sigprocmask(SIG_SETMASK, &(old_set), NULL)
+
 /* 
  * eval - Evaluate the command line that the user has just typed in
  * 
@@ -32,31 +36,29 @@ void eval(const std::string &command) {
  
     if (!isbuiltinCommand(argv)) {
  
-        // sigset_t mask_all;
-        // sigset_t mask_one, prev_one;
+        sigset_t mask_all;
+        sigset_t mask_one, prev_one;
     
-        // sigfillset(&mask_all);
+        sigfillset(&mask_all);
 
-        // sigemptyset(&mask_one);
-        // sigaddset(&mask_one, SIGCHLD);
+        sigemptyset(&mask_one);
+        sigaddset(&mask_one, SIGCHLD);
         
-        // sigprocmask(SIG_BLOCK, &(mask_one), &(prev_one));
-    //! BLOCK(mask_one, prev_one); // Block SIGCHLD.
+        BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
 
+            BLOCK_NOT_SAVE_OLD_SET(mask_all);
             Jobs::getInstance().addJob(pid, state, command);
-            // BLOCK_NOT_SAVE_OLD_SET(mask_all);
-            // addjob(jobs, pid, state, cmdline);
-            // UNBLOCK(prev_one); // Unblock SIGCHLD.
+            UNBLOCK(prev_one); // Unblock SIGCHLD.
         
             /* Parent waits for fg job to terminate.*/
             if (state == FG){
-                waitfg(pid); //! has BUG!
+                waitfg(pid); 
             }
             else {
                 // the job is bg.
-                // BLOCK_NOT_SAVE_OLD_SET(mask_all);
+                BLOCK_NOT_SAVE_OLD_SET(mask_all);
                 auto jid = Jobs::getInstance().pid2jid(pid); 
                 if (jid.has_value())
                     printf("[%d] (%d) %s", 
@@ -67,11 +69,12 @@ void eval(const std::string &command) {
                     throw std::runtime_error("Not found jid form PID2JID().");
                 }
             }  
-            // UNBLOCK(prev_one);//Unblock all signal
+            UNBLOCK(prev_one);//Unblock all signal
         }
         else {
         // child runs user job.
-        // UNBLOCK(prev_one); //Unblock SIGCHLD.
+            UNBLOCK(prev_one); //Unblock SIGCHLD.
+
             setpgid(0, 0);
             if (execve(argv[0], 
                        const_cast<char * const *>(argv.data()), 
@@ -137,12 +140,13 @@ bool isbuiltinCommand(std::vector<const char *> &argv) {
     else if (cmd_name == "&")   // Ignore singleton &. nothing is happen.
         return true;
     else if (cmd_name == "jobs") { // jobs command.
-//      sigset_t mask_all, prev_all;
-//      Sigfillset(&mask_all);
- 
-//      BLOCK(mask_all, prev_all);
+        sigset_t mask_all, prev_all;
+        sigfillset(&mask_all);
+    
+        BLOCK(mask_all, prev_all);
         Jobs::getInstance().list();
-//      UNBLOCK(prev_all);
+        UNBLOCK(prev_all);
+
         return true;
     }
     else if (cmd_name == "bg" || cmd_name == "fg") { // bg or fg commands.
@@ -158,8 +162,8 @@ bool isbuiltinCommand(std::vector<const char *> &argv) {
 void do_bgfg(std::vector<const char *> &argv) {
     int id;
     std::optional<job_t> job;
-//    sigset_t mask_all, prev_all;
-//    Sigfillset(&mask_all);
+    sigset_t mask_all, prev_all;
+    sigfillset(&mask_all);
  
     if (argv[1] == nullptr){
         assert(argv.size() == 2);
@@ -167,9 +171,9 @@ void do_bgfg(std::vector<const char *> &argv) {
         printf("%s command requires PID or %%jobid argument\n", argv[0]);
         return;
     } else if (sscanf(argv[1], "%%%d", &id) > 0){
-    //! BLOCK(mask_all, prev_all);
+        BLOCK(mask_all, prev_all);
         job = Jobs::getInstance().getJobByJid(id);
-    //! UNBLOCK(prev_all);
+        UNBLOCK(prev_all);
 
         if (!job.has_value()) {
             // not found the job.
@@ -178,9 +182,9 @@ void do_bgfg(std::vector<const char *> &argv) {
         }
 
     } else if(sscanf(argv[1], "%d", &id) > 0){
-    //! BLOCK(mask_all, prev_all);
+        BLOCK(mask_all, prev_all);
         job = Jobs::getInstance().getJobByPid(id);
-    //! UNBLOCK(prev_all); 
+        UNBLOCK(prev_all); 
         if (!job.has_value()) {
  
             printf("(%d): No such process\n", id);
