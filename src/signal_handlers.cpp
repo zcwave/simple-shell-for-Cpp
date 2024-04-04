@@ -4,9 +4,7 @@
 #include "Jobs.hpp"
 
 using std::cout, std::endl;
-/*****************
- * Signal handlers
- *****************/
+
 
 /* 
  * sigchld_handler - The kernel sends a SIGCHLD to the shell whenever

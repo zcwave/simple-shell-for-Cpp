@@ -24,8 +24,10 @@ void eval(const std::string &command) {
     }
 
     std::vector<const char *> argv{}; // argument list exec()
-   // constructing argv[MAXARGS] And return true if job is bg. iow, the last char is &.
-    auto state { parseline(command ,argv) }; // should the job run in bg or fg?
+   // constructing argv[MAXARGS] And return true if job is bg. 
+   // iow, the last char is &.
+    auto state { parseline(command ,argv) }; 
+    // should the job run in bg or fg?
  
     if (!isbuiltinCommand(argv)) {
  
@@ -40,16 +42,15 @@ void eval(const std::string &command) {
      // BLOCK(mask_one, prev_one); // Block SIGCHLD.
      
         if (auto pid = fork()) {
+
             Jobs::getInstance().addJob(pid, state, command);
-            
-            wait(0);
             // BLOCK_NOT_SAVE_OLD_SET(mask_all);
             // addjob(jobs, pid, state, cmdline);
             // UNBLOCK(prev_one); // Unblock SIGCHLD.
         
             /* Parent waits for fg job to terminate.*/
             if (state == FG){
-                waitfg(pid);
+                waitfg(pid); //! has BUG!
             }
             else {
                 // the job is bg.
@@ -92,17 +93,22 @@ void eval(const std::string &command) {
 
 JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
 
-    JobState state = FG;
+    JobState state = FG; //? 默认是一个FG好吗？ 默认是UNDEF怎么样？
     std::istringstream iss(cmdline);
-    std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
-                                    std::istream_iterator<std::string>{}};
+    std::vector<std::string> tokens {
+        std::istream_iterator<std::string>{iss},
+        std::istream_iterator<std::string>{}};
 
     for (auto &x : tokens) {
         argv.push_back(std::move(x.c_str()));
     }
     //! 待测试 move！ 与 auto &
 
-    //? DEBUG: std::cout << *argv.rbegin() << std::endl;
+    //? DEBUG: 
+    if (verbose)
+        std::cout << "Last argument in argv: " << *argv.rbegin() << std::endl;
+
+
     /* should the job run in the background? */
     if (*argv.rbegin() == string("&")) {
         if (argv.size() > 2) {
