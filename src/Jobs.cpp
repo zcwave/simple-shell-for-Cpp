@@ -45,7 +45,7 @@ int Jobs::maxjid() const {
 bool Jobs::deleteJob(pid_t pid) {
     auto clear = [](auto &job) {
         job_t tJob; //? 空的构造函数
-        
+
         assert(tJob.pid == 0);
         assert(tJob.jid == 0);
         assert(tJob.state == UNDEF);
@@ -79,6 +79,9 @@ bool Jobs::deleteJob(pid_t pid) {
 }
 
 std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
+    
+    if (pid < 1)
+        return std::nullopt;
 
     auto cond = [&pid](job_t j) {
         return j.pid == pid;
@@ -95,18 +98,29 @@ std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
 
 std::optional<job_t> Jobs::getJobByJid(int jid) {
 
+    auto cond = [&jid](job_t j) {
+        return j.pid == jid;
+    };
+    
+    auto found = std::find_if(job_list.begin(), 
+                              job_list.end(), 
+                              cond);
+    if (found != job_list.end()) 
+        return *found;
     return std::nullopt;
+    
 }
 
 
-int Jobs::pid2jid(pid_t pid) {
+std::optional<int> Jobs::pid2jid(pid_t pid) {
 
-    //! 这个函数应该是类内的吗？
-    return 1;
+    auto job = getJobByPid(pid);
+    if (job.has_value()) {
+        return job.value().jid;
+    }
+    return std::nullopt;
+
 }
-
-
-
 
 void Jobs::list() {
 

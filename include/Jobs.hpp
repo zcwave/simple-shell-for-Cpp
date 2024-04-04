@@ -70,7 +70,7 @@ public:
 
 
     /* pid2jid - Map process ID to job ID */
-    int pid2jid(pid_t pid);     
+    std::optional<int> pid2jid(pid_t pid);     
     
     
     /* listjobs - Print the job list */
