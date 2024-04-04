@@ -48,16 +48,23 @@ void eval(const std::string &command) {
             // UNBLOCK(prev_one); // Unblock SIGCHLD.
         
             /* Parent waits for fg job to terminate.*/
-            // if (state == FG){
-            //     waitfg(pid);
-            // }
-            // else {
-            //     // the job is bg.
-            //     // BLOCK_NOT_SAVE_OLD_SET(mask_all);
-            //     int jid = Jobs::getInstance().pid2jid(pid); //! 要检测映射是否返回一个值
-            //     printf("[%d] (%d) %s", jid, pid, command.c_str());
-            // }  
-            // // UNBLOCK(prev_one);//Unblock all signal
+            if (state == FG){
+                waitfg(pid);
+            }
+            else {
+                // the job is bg.
+                // BLOCK_NOT_SAVE_OLD_SET(mask_all);
+                auto jid = Jobs::getInstance().pid2jid(pid); 
+                if (jid.has_value())
+                    printf("[%d] (%d) %s", 
+                                      jid.value(), 
+                                              pid, 
+                                      command.c_str());
+                else {
+                    throw std::runtime_error("Not found jid form PID2JID().");
+                }
+            }  
+            // UNBLOCK(prev_one);//Unblock all signal
         }
         else {
         // child runs user job.
