@@ -50,8 +50,11 @@ public:
 
 
     /* deletejob - Delete a job whose PID=pid from the job list */
-    void deleteJob(pid_t pid);
+    bool deleteJob(pid_t pid);
 
+
+    /* maxjid - Returns largest allocated job ID */
+    int maxjid() const;
 
     /* fgpid - Return PID of current foreground job, 0 if no such job */
     pid_t getFgPid() const {
