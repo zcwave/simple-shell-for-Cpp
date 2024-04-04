@@ -1,66 +1,30 @@
-#ifndef __TSH__H__
-#define __TSH__H__   
+#pragma once
 
 /* 
  * tsh - A tiny shell program with job control
  */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
-
 #include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
-
-#include <string>
-#include <string_view>
 #include <vector>
-#include <iostream>
-
 #include "jobs_types.h"
 
-
-/* Misc manifest constants */
-constexpr int MAXLINE = 1024;     /* max line size */
-constexpr int MAXARGS = 128;      /* max args on a command line */
 constexpr int MAXJOBS = 16;       /* max jobs at any point in time */
 constexpr int MAXJID  = 1 << 16;  /* max job ID : 65536 */ 
-
-
 
 extern bool verbose; 
 extern volatile sig_atomic_t FG_PID_GLOBALS;
 
 
-// #define BLOCK(set, old_set) / 
-//         sigprocmask(SIG_BLOCK, &(set), &(old_set))
-// #define BLOCK_NOT_SAVE_OLD_SET(set) /
-//         sigprocmask(SIG_BLOCK, &(set), NULL)
-// #define UNBLOCK(old_set) /
-//         sigprocmask(SIG_SETMASK, &(old_set), NULL)
-
-
-
-
-// /* Function prototypes */
-
-// /* Here are the functions that you will implement */
 void eval(const std::string &command_line);  
 bool isbuiltinCommand(std::vector<const char *> &argv);
 JobState parseline(const std::string &cmdline, std::vector<const char *> &argv); 
+
 /* 
  * do_bgfg - Execute the builtin bg and fg commands
  */
 void do_bgfg(std::vector<const char *> &argv);
 void waitfg(pid_t pid);
 
-
+// in 'lib/utilities.h
 void usage(void);
-// void unix_error(char *msg);
-void app_error(const std::string_view msg);
 
-#endif // __TSH__H__
