@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "tsh.h"
 #include "Signal.hpp"
 #include "Jobs.hpp"
