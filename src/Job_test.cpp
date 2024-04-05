@@ -47,13 +47,14 @@ void testPid2Jid() {
 // 测试打印作业列表
 void testListJobs() {
     Jobs& jobs = Jobs::getInstance();
-    jobs.addJob(1111, BG, "hello");
-    jobs.addJob(1111, BG, "hello");
-    jobs.addJob(1111, BG, "hello");
-    jobs.addJob(1111, BG, "hello");
-    jobs.addJob(1111, BG, "hello");
-    jobs.addJob(1111, BG, "hello");
-    jobs.list();
+    int pid = 1234;
+    for (int i = 0; i < 16; i++) 
+        jobs.addJob(pid++, BG, "hello");
+    for (int i = 0; i < 8; i++) 
+        jobs.deleteJob(1234);
+
+
+    // jobs.list();
     // 还可以添加更多测试逻辑，例如检查打印的作业列表是否正确等
 }
 

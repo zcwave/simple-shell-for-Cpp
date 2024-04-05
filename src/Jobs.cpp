@@ -39,7 +39,9 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
 
 int Jobs::maxjid() const {
 	auto comp = [](job_t j1, job_t j2) { return j1.jid < j2.jid;};
-	auto max = std::max_element(job_list.begin(), job_list.end(), comp);
+	auto max = std::max_element(job_list.begin(), 
+                                job_list.end(),
+                                comp);
     return max->jid;
 }
 
@@ -70,12 +72,22 @@ bool Jobs::deleteJob(pid_t pid) {
 
     if (found != job_list.end()) { // found it;
         auto &it = *found;
+
+        if (verbose) {
+
+            printf("Added job [%d] (%d) %s\n", 
+                                it.jid, 
+                                it.pid, 
+                                it.cmdline.c_str());
+        }
+
         clear(it);
-        next_jid = maxjid() + 1;
+        next_jid = maxjid() + 1; //! 好像有溢出的风险
+        assert(next_jid <= MAXJOBS);
         return true;
     }
 
-    return 0;
+    return false;
 
 }
 
