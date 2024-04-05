@@ -11,7 +11,6 @@ class Jobs {
 private:
     Jobs(int job_max_num) : 
                             job_list({}), 
-                            fgpid(0), 
                             next_jid(1), 
                             max_jobs(job_max_num) {
                                 
@@ -34,7 +33,6 @@ private:
 
 private: 
     std::vector<job_t> job_list;
-    pid_t fgpid;
     int next_jid;
     int max_jobs;
 
@@ -58,9 +56,7 @@ public:
     int maxjid() const;
 
     /* fgpid - Return PID of current foreground job, 0 if no such job */
-    pid_t getFgPid() const {
-        return fgpid;
-    }
+    std::optional<pid_t> getFgPid() const;
 
 
     /* getjobjid  - Find a job (by JID) on the job list */

@@ -5,8 +5,12 @@
 
 bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
     
-    if (pid < 1)
+    if (pid < 1) {
+        if (verbose) {
+            printf("%s: invaild Pid\n", __func__);
+        }
 		return false;
+    }
 
 
     for (auto &x : job_list) {
@@ -16,13 +20,10 @@ bool Jobs::addJob(pid_t pid, JobState state, std::string cmdline) {
             if (next_jid > MAXJOBS)
                 next_jid = 1;
 
-            if (state == FG) {
-                fgpid = pid;
-            }
-
             if (verbose) {
 
-                printf("Added job [%d] (%d) %s\n", 
+                printf("%s: Added job [%d] (%d) %s\n", 
+                                    __func__,
                                     x.jid, 
                                     x.pid, 
                                     x.cmdline.c_str());
@@ -45,6 +46,26 @@ int Jobs::maxjid() const {
     return max->jid;
 }
 
+std::optional<pid_t> Jobs::getFgPid() const {
+    auto cond = [](const job_t &job) {
+        return job.state == FG;
+    };
+
+    auto found = std::find_if(job_list.begin(),
+                               job_list.end(),
+                               cond);
+
+    if (found != job_list.end()) {
+        return found->pid;
+    }
+
+    if (verbose) {
+        printf("%s: Not Found it", __func__);
+    }
+    return std::nullopt;
+}
+
+
 bool Jobs::deleteJob(pid_t pid) {
     auto clear = [](auto &job) {
         job_t tJob; //? 空的构造函数
@@ -59,6 +80,9 @@ bool Jobs::deleteJob(pid_t pid) {
 
     if (pid < 1) {
         //! throw !!!
+        if (verbose) {
+            printf("%s: invaild Pid\n", __func__);
+        }
         return false;
     }
     
@@ -75,26 +99,35 @@ bool Jobs::deleteJob(pid_t pid) {
 
         if (verbose) {
 
-            printf("Added job [%d] (%d) %s\n", 
+            printf("%s: Deleted job [%2d] (%d) %s\n", 
+                                __func__,
                                 it.jid, 
                                 it.pid, 
                                 it.cmdline.c_str());
         }
 
         clear(it);
-        next_jid = maxjid() + 1; //! 好像有溢出的风险
+        next_jid = (maxjid() + 1) % MAXJOBS; //! 好像有溢出的风险
+        //! 的确有，打个补丁吧。
         assert(next_jid <= MAXJOBS);
         return true;
     }
 
+    if (verbose) {
+        printf("%s: Not Found it", __func__);
+    }
     return false;
 
 }
 
 std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
     
-    if (pid < 1)
+    if (pid < 1) {
+        if (verbose) {
+            printf("%s: invaild Pid\n", __func__);
+        }
         return std::nullopt;
+    }
 
     auto cond = [&pid](job_t j) {
         return j.pid == pid;
