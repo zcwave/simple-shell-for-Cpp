@@ -1,4 +1,4 @@
-# Simple Unix shell for cpp
+ # Simple Unix shell for cpp
 
 - [x] branch mini: 一个最小实现，不支持Jobs control. (done)
 - [x] branch main: 完整实现，支持Jobs control. (doing)
@@ -33,10 +33,10 @@ CMakeLists.txt  LICENSE  README.md  build  include  lib  src
 # 待解决的BUG
 
 1. 可能访问一个已经结束的后台任务
-   ```bash
+```bash
   tsh> /bin/sleep 10 &
   [1] (39479) Foreground /bin/sleep 10
   tsh> fg %1  # 此时 %1 已经结束
   ....
-  ```
+```
 2. 由(1)而导致的Jobs可能存在数据竞争....
