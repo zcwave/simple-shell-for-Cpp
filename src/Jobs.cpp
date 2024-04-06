@@ -145,7 +145,7 @@ std::optional<job_t> Jobs::getJobByPid(pid_t pid) {
 std::optional<job_t> Jobs::getJobByJid(int jid) {
 
     auto cond = [&jid](job_t j) {
-        return j.pid == jid;
+        return j.jid == jid;
     };
     
     auto found = std::find_if(job_list.begin(), 

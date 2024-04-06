@@ -62,7 +62,7 @@ void eval(const std::string &command) {
                 BLOCK_NOT_SAVE_OLD_SET(mask_all);
                 auto jid = Jobs::getInstance().pid2jid(pid); 
                 if (jid.has_value())
-                    printf("[%d] (%d) %s", 
+                    printf("[%d] (%d) %s\n", 
                                       jid.value(), 
                                               pid, 
                                       command.c_str());
@@ -136,6 +136,7 @@ JobState parseline(const string &cmdline, std::vector<const char*> &argv) {
 bool isbuiltinCommand(std::vector<const char *> &argv) {
 
     string cmd_name = argv[0];
+
     if (cmd_name == "quit") // quit command.
         exit(0);
     else if (cmd_name == "&")   // Ignore singleton &. nothing is happen.
@@ -162,6 +163,7 @@ bool isbuiltinCommand(std::vector<const char *> &argv) {
  */
 void do_bgfg(std::vector<const char *> &argv) {
     int id;
+    auto& jobs {Jobs::getInstance()};
     std::optional<job_t> job;
     sigset_t mask_all, prev_all;
     sigfillset(&mask_all);
@@ -173,7 +175,7 @@ void do_bgfg(std::vector<const char *> &argv) {
         return;
     } else if (sscanf(argv[1], "%%%d", &id) > 0){
         BLOCK(mask_all, prev_all);
-        job = Jobs::getInstance().getJobByJid(id);
+        job = jobs.getJobByJid(id);
         UNBLOCK(prev_all);
 
         if (!job.has_value()) {
@@ -184,7 +186,7 @@ void do_bgfg(std::vector<const char *> &argv) {
 
     } else if(sscanf(argv[1], "%d", &id) > 0){
         BLOCK(mask_all, prev_all);
-        job = Jobs::getInstance().getJobByPid(id);
+        job = jobs.getJobByPid(id);
         UNBLOCK(prev_all); 
         if (!job.has_value()) {
  
@@ -192,26 +194,28 @@ void do_bgfg(std::vector<const char *> &argv) {
             return;
         }
 
-   } else {
+    } else {
         // not pid or jid.
         printf("%s: argument must be a PID or %%jobid\n", argv[0]);
         return;
-   }
+    }
+
+    auto& _job {job.value()};
  
     if (argv[0] == string("bg")) {
 
-        kill(-(job.value().pid), SIGCONT);
-        job.value().state = BG;
+        kill(-(_job.pid), SIGCONT);
+        _job.state = BG;
         printf("[%d] (%d) %s", 
-                        job.value().jid, 
-                        job.value().pid, 
-                        job.value().cmdline.c_str());
+                        _job.jid, 
+                        _job.pid, 
+                        _job.cmdline.c_str());
 
     } else if (argv[0] == string("fg")) {
 
-        kill(-(job->pid), SIGCONT);
-        job.value().state = FG;
-        waitfg(job.value().pid);
+        kill(-(_job.pid), SIGCONT);
+        _job.state = FG;
+        waitfg(_job.pid);
 
     }
 }
