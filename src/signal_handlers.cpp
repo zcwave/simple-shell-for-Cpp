@@ -90,12 +90,12 @@ void sigint_handler(int sig) {
     int old_errno = errno;
     auto pid = Jobs::getInstance().getFgPid();
 
-    assert(pid.has_value()); //! 预防一个可能的未定义行为
-
-    auto _pid = pid.value();
-
-    if (pid != 0)
-        kill(-_pid, sig);
+    if (pid.has_value())
+        kill(-pid.value(), sig);
+    else {
+        if (verbose) 
+            cout << __func__ << " : " << "Not found fgpid."<< endl;
+    }
 
     errno = old_errno;
 
@@ -112,8 +112,17 @@ void sigtstp_handler(int sig) {
     int old_errno = errno;
     auto pid = Jobs::getInstance().getFgPid();
 
-    if (pid != 0)
-        kill(-pid, sig);
+    if (pid.has_value())
+        kill(-pid.value(), sig);
+    else {
+        if (verbose) 
+            cout << endl
+                 << __func__ 
+                 << " : " 
+                 << "Not found fgpid." 
+                 << endl;
+    }
+
     errno = old_errno;
 
 }
@@ -129,8 +138,3 @@ void sigquit_handler(int sig) {
     exit(1);
 
 }
-
-/*********************
- * End signal handlers
- *********************/
-
