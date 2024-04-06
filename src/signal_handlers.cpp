@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sys/wait.h>
+#include <cassert>
 
 #include "tsh.h"
 #include "jobs_types.h"
@@ -31,7 +32,8 @@ void sigchld_handler(int sig) {
                          &status, 
                          WNOHANG | WUNTRACED)) > 0) {
         BLOCK(mask_all, prev_all);
-        auto job = Jobs::getInstance().getJobByPid(pid);
+        auto &jobs = Jobs::getInstance();
+        auto job = jobs.getJobByPid(pid);
 
         if (!job.has_value()) {
             if (verbose)
@@ -40,27 +42,28 @@ void sigchld_handler(int sig) {
             return;
         }
  
+        auto _job = job.value();
 
-        if (pid == Jobs::getInstance().getFgPid()) {
+        if (pid == jobs.getFgPid()) {
             FG_PID_GLOBALS = pid;
         }
 
 
         if (WIFEXITED(status)) {  
         // Normal: delete job
-            Jobs::getInstance().deleteJob(pid); 
+            jobs.deleteJob(pid); 
         } else if (WIFSIGNALED(status)) { 
         // C^C: print,and delete job
             printf("Job [%d] (%d) terminated by signal %d\n", 
-                                                        job.value().jid, 
-                                                        job.value().pid, 
+                                                        _job.jid, 
+                                                        _job.pid, 
                                                         WTERMSIG(status));
             Jobs::getInstance().deleteJob(pid); 
         } else if (WIFSTOPPED(status)) {
         // C^Z: print,and moditfy job state.
             printf("Job [%d] (%d) stopped by signal %d\n", 
-                                                    job.value().jid, 
-                                                    job.value().pid, 
+                                                    _job.jid, 
+                                                    _job.pid, 
                                                     WSTOPSIG(status));
             job.value().state = ST;
         } else {
@@ -87,8 +90,12 @@ void sigint_handler(int sig) {
     int old_errno = errno;
     auto pid = Jobs::getInstance().getFgPid();
 
+    assert(pid.has_value()); //! 预防一个可能的未定义行为
+
+    auto _pid = pid.value();
+
     if (pid != 0)
-        kill(-pid, sig);
+        kill(-_pid, sig);
 
     errno = old_errno;
 

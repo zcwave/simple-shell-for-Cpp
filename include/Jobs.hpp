@@ -59,10 +59,10 @@ public:
     std::optional<pid_t> getFgPid() const;
 
 
-    /* getjobjid  - Find a job (by JID) on the job list */
+    /* getjobpid  - Find a job (by PID) on the job list */
     std::optional<job_t> getJobByPid(pid_t pid);
     
-
+    /* getjobjid  - Find a job (by JID) on the job list */
     std::optional<job_t> getJobByJid(int jid);
 
 

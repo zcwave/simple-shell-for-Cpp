@@ -30,15 +30,15 @@ add_executable(${PROJECT_NAME}
     ${SRC_DIR}/Jobs.cpp 
 )
 
-add_executable(Job_test
-    ${SRC_DIR}/Job_test.cpp
-    ${SRC_DIR}/Jobs.cpp 
-)
+# add_executable(Job_test
+#     ${SRC_DIR}/Job_test.cpp
+#     ${SRC_DIR}/Jobs.cpp 
+# )
 
-target_include_directories(Job_test
-    PUBLIC
-    ${INCLUDE_DIR} 
-)
+# target_include_directories(Job_test
+#     PUBLIC
+#     ${INCLUDE_DIR} 
+# )
 
 # 指定头文件目录
 target_include_directories(${PROJECT_NAME} 
